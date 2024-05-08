@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1093042547660",
+    "project_id": "pit-flutter-c3485",
+    "storage_bucket": "pit-flutter-c3485.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1093042547660:android:7f341c6884d27b8c2a8b69",
+        "android_client_info": {
+          "package_name": "id.isdigital.pit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1093042547660-eoqo1lm4bnvvotmjimjmfj0c2v45825n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTF8Lh1DIeljoqzgVoCeLLUH9CBfN7s_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1093042547660-eoqo1lm4bnvvotmjimjmfj0c2v45825n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
