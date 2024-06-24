@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pit/helpers/Preferences.dart';
@@ -13,6 +11,8 @@ import 'package:pit/utils/SizeConfig.dart';
 import '../utils/getLocation.dart';
 
 class LoginPhone extends StatefulWidget {
+  const LoginPhone({super.key});
+
   @override
   State<LoginPhone> createState() => _LoginPhoneState();
 }
@@ -50,7 +50,8 @@ class _LoginPhoneState extends State<LoginPhone> {
     MySize().init(context);
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context)
+          .copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
         backgroundColor: Colors.white,
         resizeToAvoidBottomInset: false,
@@ -64,209 +65,120 @@ class _LoginPhoneState extends State<LoginPhone> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        Image(
+                          width: MediaQuery.of(context).size.width, //160
+                          image: const AssetImage(
+                              'assets/images/logo_pit_elektronik.png'),
+                        ),
+                        SizedBox(
+                          height: 24,
+                        ),
                         Text("Masuk akun",
                             textAlign: TextAlign.center,
                             style:
                                 AppTheme.OpenSans600(31, AppTheme.warnaHitam)),
                         SizedBox(
-                          height: 54 * MySize.scaleFactorHeight,
+                          height: 12,
                         ),
-                        Text("Mohon masukkan nomor handphone anda",
+                        Text(
+                            "Mohon masuk menggunakan user login yang sudah terdaftar.",
                             style: AppTheme.OpenSans400LS(
                                 14, AppTheme.warnaHitam, -0.36)),
                         Container(
-                          constraints:
-                              BoxConstraints(minWidth: 300, maxWidth: 300),
-                          margin: EdgeInsets.only(
-                              top: 23 * MySize.scaleFactorHeight),
-                          child: Card(
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0)),
-                            child: Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    child: Text(
-                                      '+62',
-                                      style: AppTheme.OpenSans400LS(
-                                          25, AppTheme.warnaHitam, 0.74),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 12.0,
-                                  ),
-                                  Container(
-                                    child: Text(
-                                      '|',
-                                      style: TextStyle(
-                                          fontFamily: 'OpenSans',
-                                          fontSize: 25,
-                                          color: const Color(0xFF2C2948)
-                                              .withOpacity(0.2)),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 12.0,
-                                  ),
-                                  Expanded(
-                                    child: Form(
-                                      key: _formKey,
-                                      child: Theme(
-                                        data: themeData.copyWith(
-                                            inputDecorationTheme: AppTheme
-                                                .loginDecorationTheme()),
-                                        child: TextFormField(
-                                          style: AppTheme.OpenSans400LS(
-                                              25, AppTheme.warnaHitam, 0.7),
-                                          decoration: const InputDecoration(
-                                            hintText: ' nomor handphone',
-                                            hintStyle: TextStyle(
-                                                fontSize: 15,
-                                                fontFamily: 'OpenSans'),
-                                          ),
-                                          controller: myNumberController,
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter
-                                                .digitsOnly
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                          margin: EdgeInsets.only(top: 32),
+                          child: Form(
+                            key: _formKey,
+                            child: Theme(
+                              data: themeData.copyWith(
+                                  inputDecorationTheme:
+                                      AppTheme.loginDecorationTheme()),
+                              child: TextFormField(
+                                style: AppTheme.OpenSans400LS(
+                                    22, AppTheme.warnaHitam, 0.7),
+                                decoration: const InputDecoration(
+                                  hintText: 'User Login',
+                                  hintStyle: TextStyle(
+                                      fontSize: 15, fontFamily: 'OpenSans'),
+                                ),
+                                controller: myNumberController,
+                                keyboardType: TextInputType.text,
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(
-                          height: 105 * MySize.scaleFactorHeight,
-                        ),
                         Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: EdgeInsets.only(top: 24),
                             child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: AppTheme.warnaHijau,
-                            minimumSize: Size(289 * MySize.scaleFactorWidth,
-                                63 * MySize.scaleFactorHeight),
-                            padding: EdgeInsets.only(
-                                left: 43 * MySize.scaleFactorWidth,
-                                right: 43 * MySize.scaleFactorWidth),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(72.5)),
-                            ),
-                          ),
-                          onPressed: () async {
-                            FocusScope.of(context).unfocus();
-                            setState(() {
-                              _state = 0;
-                              if (_state == 0) {
-                                animateButton();
-                              }
-                            });
-                            // String strPhone = myNumberController.text;
-                            String strMessage = "";
-                            String nomer = "";
-                            if (myNumberController.text != "") {
-                              if (myNumberController.text[0] != "0") {
-                                nomer = "0" + myNumberController.text;
-                              } else {
-                                nomer = myNumberController.text;
-                              }
-                            }
-                            if (nomer == "") {
-                              strMessage =
-                                  "Harap masukan nomor handphone anda.";
-                              setState(() {
-                                _state = 0;
-                              });
-                            } else if (nomer.length < 10) {
-                              strMessage =
-                                  "Periksa kembali nomor handphone anda.";
-                              setState(() {
-                                _state = 0;
-                              });
-                            } else {
-                              UserNetwork objUserNetwork = UserNetwork();
-
-                              Network objNetwork =
-                                  await objUserNetwork.getUserLogin(nomer);
-                              if (objNetwork.Status) {
-                                if (_state == 1) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => LoginOtp(
-                                        Type: "otp",
-                                        Phone: nomer,
-                                      ),
-                                    ),
-                                  );
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.warnaHijau,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(72.5)),
+                                ),
+                              ),
+                              onPressed: () async {
+                                FocusScope.of(context).unfocus();
+                                setState(() {
+                                  _state = 0;
+                                  if (_state == 0) {
+                                    animateButton();
+                                  }
+                                });
+                                // String strPhone = myNumberController.text;
+                                String strMessage = "";
+                                String nomer = "";
+                                if (myNumberController.text != "") {
+                                  nomer = myNumberController.text;
+                                }
+                                if (nomer == "") {
+                                  strMessage = "Harap masukan user login anda.";
                                   setState(() {
                                     _state = 0;
                                   });
-                                }
-                              } else {
-                                print("response api login");
-                                print(objNetwork.Data);
-                                print(objNetwork.Status);
-                                print(objNetwork.Message);
-                                print(objNetwork.Error);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(
-                                            objNetwork.Message.toString())));
-                                // Text('gagal login ga dpt respon dari api')));
-                                setState(() {
-                                  _state = 0;
-                                });
-                              }
-                            }
+                                } else {
+                                  UserNetwork objUserNetwork = UserNetwork();
 
-                            if (strMessage != "") {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(strMessage)));
-                            }
-                          },
-                          child: setUpButtonChild(),
-                        )),
-                        // Container(
-                        //   margin:
-                        //       EdgeInsets.only(top: 23 * MySize.scaleFactorHeight),
-                        //   child: RichText(
-                        //     text: TextSpan(
-                        //         text: 'Belum punya akun? ',
-                        //         style: AppTheme.OpenSans400LS(
-                        //             14, AppTheme.warnaHitam, -0.36),
-                        //         children: <TextSpan>[
-                        //           TextSpan(
-                        //               text: 'Daftar',
-                        //               style: AppTheme.OpenSans600LS(
-                        //                   14, AppTheme.warnaHitam, -0.36),
-                        //               recognizer: TapGestureRecognizer()
-                        //                 ..onTap = () {
-                        //                   Navigator.push(
-                        //                     context,
-                        //                     MaterialPageRoute(
-                        //                       builder: (context) => Register(),
-                        //                     ),
-                        //                   );
-                        //                   // navigate to desired screen
-                        //                 })
-                        //         ]),
-                        //   ),
-                        // ),
-                        SizedBox(
-                          height: 86 * MySize.scaleFactorHeight,
-                        ),
-                        Image(
-                          width: MySize.getScaledSizeWidth(250), //160
-                          image: const AssetImage(
-                              'assets/images/logo_pit_elektronik.png'),
-                        )
+                                  Network objNetwork =
+                                      await objUserNetwork.getUserLogin(nomer);
+                                  if (objNetwork.Status) {
+                                    if (_state == 1) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => LoginOtp(
+                                            Type: "otp",
+                                            Phone: nomer,
+                                          ),
+                                        ),
+                                      );
+                                      setState(() {
+                                        _state = 0;
+                                      });
+                                    }
+                                  } else {
+                                    print("response api login");
+                                    print(objNetwork.Data);
+                                    print(objNetwork.Status);
+                                    print(objNetwork.Message);
+                                    print(objNetwork.Error);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text(objNetwork.Message
+                                                .toString())));
+                                    setState(() {
+                                      _state = 0;
+                                    });
+                                  }
+                                }
+
+                                if (strMessage != "") {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(strMessage)));
+                                }
+                              },
+                              child: setUpButtonChild(),
+                            )),
                       ]),
                 ),
               ],

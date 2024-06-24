@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart';
@@ -17,7 +16,7 @@ class TaskNetwork {
   // final String _Url = "http://192.168.20.24";
 
   // final String _Url = "https://testpit.odoo.com"; //staging
-  final String _Url = "https://pitelektronik.odoo.com"; //production
+  final String _Url = "http://103.195.30.141:8069"; //production
   String generateMd5(String input) {
     return md5.convert(utf8.encode(input)).toString();
   }
@@ -34,6 +33,8 @@ class TaskNetwork {
     String strUserId = await boxdata.getLoginCredential(param: "userId");
 
     dynamic headers = await objOdooServer.getHeaderApiParam();
+    print('headerss ${headers}');
+
     dynamic objParam = {
       "jsonrpc": "2.0",
       "method": "call",
@@ -70,13 +71,13 @@ class TaskNetwork {
     final tanggal = DateFormat('dd').format(DateTime.now());
     late var valDashboard;
     late var data;
-    var openBox_dashboard = await Hive.openBox("box_dashboard");
-    var insertBox_dashboard = Hive.box("box_dashboard");
-    if (openBox_dashboard.isNotEmpty) {
-      valDashboard = openBox_dashboard.get("values");
+    var openboxDashboard = await Hive.openBox("box_dashboard");
+    var insertboxDashboard = Hive.box("box_dashboard");
+    if (openboxDashboard.isNotEmpty) {
+      valDashboard = openboxDashboard.get("values");
       valDashboard['getPekerjaan'] += 1;
 
-      insertBox_dashboard.put("values", valDashboard);
+      insertboxDashboard.put("values", valDashboard);
     } else {
       valDashboard = {
         "Date": tanggal,
@@ -87,7 +88,7 @@ class TaskNetwork {
         "taskPendingKirim": 0,
         "Point": 0,
       };
-      insertBox_dashboard.put("values", valDashboard);
+      insertboxDashboard.put("values", valDashboard);
     }
   }
 

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:pit/themes/AppTheme.dart';
@@ -12,7 +11,7 @@ class AboutUs extends StatelessWidget {
     MySize().init(context);
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
           appBar: AppBar(
             backgroundColor: AppTheme.warnaUngu,

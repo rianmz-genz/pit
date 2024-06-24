@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 
@@ -12,7 +11,7 @@ class Notif_detail extends StatelessWidget {
   Widget build(BuildContext context) {
     MySize().init(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
           appBar: AppBar(
             backgroundColor: AppTheme.warnaUngu,
@@ -34,7 +33,7 @@ class Notif_detail extends StatelessWidget {
               children: [
                 Padding(
                   // padding: const EdgeInsets.all(8.0),
-                  padding: EdgeInsets.fromLTRB(15, 17, 23, 0),
+                  padding: const EdgeInsets.fromLTRB(15, 17, 23, 0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,7 +50,7 @@ class Notif_detail extends StatelessWidget {
                       ),
                       Text(
                         "Selamat!",
-                        style: AppTheme.OpenSans600(20, Color(0xFF060606)),
+                        style: AppTheme.OpenSans600(20, const Color(0xFF060606)),
                       ),
                       SizedBox(
                         height: 3 * MySize.scaleFactorHeight,
@@ -59,7 +58,7 @@ class Notif_detail extends StatelessWidget {
                       Text(
                         "2 Jun 2020",
                         style: AppTheme.OpenSans500(
-                            13, Color(0xFF000000).withOpacity(0.4)),
+                            13, const Color(0xFF000000).withOpacity(0.4)),
                       ),
                       SizedBox(
                         height: 18 * MySize.scaleFactorHeight,
@@ -71,7 +70,7 @@ class Notif_detail extends StatelessWidget {
                       Text(
                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit.In consequat venenatis turpis…",
                         textAlign: TextAlign.start,
-                        style: AppTheme.OpenSans500(15, Color(0xFF060606)),
+                        style: AppTheme.OpenSans500(15, const Color(0xFF060606)),
                       ),
                       SizedBox(
                         height: 5 * MySize.scaleFactorHeight,
@@ -79,7 +78,7 @@ class Notif_detail extends StatelessWidget {
                       Text(
                         "Lokasi : Jl. Garuda No.32, RT.1/RW.4, Kemayoran, Kec. Kemayoran, Kota Jakarta Pusat, Daerah Khusus Ibukota Jakarta 10620",
                         textAlign: TextAlign.start,
-                        style: AppTheme.OpenSans500(15, Color(0xFF060606)),
+                        style: AppTheme.OpenSans500(15, const Color(0xFF060606)),
                       ),
                       SizedBox(
                         height: 5 * MySize.scaleFactorHeight,
@@ -87,7 +86,7 @@ class Notif_detail extends StatelessWidget {
                       Text(
                         "Status Garansi : Tidak",
                         textAlign: TextAlign.start,
-                        style: AppTheme.OpenSans500(15, Color(0xFF060606)),
+                        style: AppTheme.OpenSans500(15, const Color(0xFF060606)),
                       ),
                     ],
                   ),

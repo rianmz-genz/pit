@@ -20,7 +20,7 @@ class PopupError {
       } else {
         if (objNetwork.Error != null && objNetwork.Error != "") {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              duration: Duration(seconds: 5),
+              duration: const Duration(seconds: 5),
               content: Text(objNetwork.Error!)));
         }
       }

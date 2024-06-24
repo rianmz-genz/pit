@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pit/utils/boxData.dart';
 
@@ -22,7 +21,7 @@ class informationPage extends StatelessWidget {
           onPressed: () {
             return Navigator.of(context).pop();
           },
-          icon: Icon(Icons.keyboard_arrow_left, size: 40),
+          icon: const Icon(Icons.keyboard_arrow_left, size: 40),
         ),
         centerTitle: true,
         title: const Text(
@@ -51,10 +50,10 @@ class informationPage extends StatelessWidget {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.white,
-                minimumSize: Size(259, 63),
-                padding: EdgeInsets.only(left: 43, right: 43),
-                shape: RoundedRectangleBorder(
+                backgroundColor: Colors.white,
+                minimumSize: const Size(259, 63),
+                padding: const EdgeInsets.only(left: 43, right: 43),
+                shape: const RoundedRectangleBorder(
                   side: BorderSide(
                       color: AppTheme.warnaHijau,
                       width: 1.0,
@@ -80,7 +79,7 @@ class informationPage extends StatelessWidget {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: AppTheme.warnaHijau,
+                backgroundColor: AppTheme.warnaHijau,
                 // minimumSize: Size(60, 63),
                 fixedSize: const Size(60, 63),
                 padding: const EdgeInsets.only(left: 43, right: 43),
@@ -105,10 +104,10 @@ class informationPage extends StatelessWidget {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: AppTheme.warnaHijau,
+                backgroundColor: AppTheme.warnaHijau,
                 // minimumSize: Size(60, 63),
-                fixedSize: Size(60, 63),
-                padding: EdgeInsets.only(left: 43, right: 43),
+                fixedSize: const Size(60, 63),
+                padding: const EdgeInsets.only(left: 43, right: 43),
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(72.5)),
                 ),
@@ -130,10 +129,10 @@ class informationPage extends StatelessWidget {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.white,
-                minimumSize: Size(60, 63),
-                padding: EdgeInsets.only(left: 43, right: 43),
-                shape: RoundedRectangleBorder(
+                backgroundColor: Colors.white,
+                minimumSize: const Size(60, 63),
+                padding: const EdgeInsets.only(left: 43, right: 43),
+                shape: const RoundedRectangleBorder(
                   side: BorderSide(
                       color: AppTheme.warnaDongker,
                       width: 1.0,

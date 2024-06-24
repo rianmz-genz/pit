@@ -28,12 +28,12 @@ class UserNotifier extends ChangeNotifier {
   getUser() => _User;
 
   getUploadData() async {
-    var box_OpenValueWorksheet = await Hive.openBox("box_valworksheet");
+    var boxOpenvalueworksheet = await Hive.openBox("box_valworksheet");
 
     bool checkdata = false;
-    if (box_OpenValueWorksheet.isNotEmpty) {
-      if (_User.id != null && _User.id != 0) {
-        final data = box_OpenValueWorksheet.get(_User.id);
+    if (boxOpenvalueworksheet.isNotEmpty) {
+      if (_User.id != 0) {
+        final data = boxOpenvalueworksheet.get(_User.id);
         if (data != null && data.length != 0) {
           countDataUpload = data.length;
         }

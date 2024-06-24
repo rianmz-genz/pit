@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:pit/themes/AppTheme.dart';
@@ -16,7 +15,7 @@ class SelectedItem extends StatefulWidget {
   String _title = "";
   List data = [];
 
-  SelectedItem(this.Jenis, this._title);
+  SelectedItem(this.Jenis, this._title, {super.key});
 
   @override
   _SelectedItemState createState() => _SelectedItemState();
@@ -28,10 +27,20 @@ class _SelectedItemState extends State<SelectedItem> {
   TextEditingController keywordController = TextEditingController();
   Future<dynamic> getDataItems() async {
     List<dynamic> dataFilter = [];
+    List<dynamic> dataAsli = [];
+    masterNetwork objMaster = masterNetwork();
 
+    if (widget._title == 'Garansi') {
+      Network objMasterGaransitNetwork =
+          await objMaster.getMasterWaktuGaransi();
+      dataAsli = objMasterGaransitNetwork.Data;
+    } else if (widget._title == 'Pilih part yang diganti') {
+      Network objMasterProductNetwork = await objMaster.getMasterProduct();
+      dataAsli = objMasterProductNetwork.Data;
+    }
     if (keyword != "") {
       if (widget._title == "Pilih part yang diganti") {
-        for (var sort in widget.Jenis) {
+        for (var sort in dataAsli) {
           if (sort['default_code']
                   .toString()
                   .toLowerCase()
@@ -40,13 +49,11 @@ class _SelectedItemState extends State<SelectedItem> {
                   .toString()
                   .toLowerCase()
                   .contains(keyword.toLowerCase())) {
-            // print(sort);
-            // print(sort['name']);
             dataFilter.add(sort);
           }
         }
       } else {
-        for (var sort in widget.Jenis) {
+        for (var sort in dataAsli) {
           if (sort['name']
               .toString()
               .toLowerCase()
@@ -55,13 +62,10 @@ class _SelectedItemState extends State<SelectedItem> {
           }
         }
       }
-
-      // print("dataFilter");
-      // print(dataFilter);
     } else {
       dataFilter = widget.Jenis;
     }
-    return dataFilter.toList();
+    return dataFilter.isEmpty ? dataAsli.toList() : dataFilter.toList();
   }
 
   showAlertDialog(BuildContext context) {
@@ -104,8 +108,9 @@ class _SelectedItemState extends State<SelectedItem> {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 400), () {
       // do something with query
-      keyword = data;
-      setState(() {});
+      setState(() {
+        keyword = data;
+      });
     });
   }
 
@@ -129,9 +134,11 @@ class _SelectedItemState extends State<SelectedItem> {
     } else {
       markedPage("select_item");
     }
+    print("jeniss, ${widget.Jenis}");
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context)
+          .copyWith(textScaler: const TextScaler.linear(1.0)),
       child: RefreshIndicator(
         notificationPredicate: (_) {
           if (widget._title == 'Garansi' ||
@@ -148,12 +155,10 @@ class _SelectedItemState extends State<SelectedItem> {
             Network objMasterGaransitNetwork =
                 await objMaster.getMasterWaktuGaransi();
             widget.Jenis = objMasterGaransitNetwork.Data;
-            setState(() {});
           } else if (widget._title == 'Pilih part yang diganti') {
             Network objMasterProductNetwork =
                 await objMaster.getMasterProduct();
             widget.Jenis = objMasterProductNetwork.Data;
-            setState(() {});
           }
         },
         child: Scaffold(
@@ -229,7 +234,7 @@ class _SelectedItemState extends State<SelectedItem> {
                       future: getDataItems(),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          print(snapshot.data);
+                          print('snapshot.data ${snapshot.data}');
                           List<dynamic> lstItem = snapshot.data!;
                           int _length = lstItem.length;
                           return ListView.builder(
@@ -303,7 +308,7 @@ class _SelectedItemState extends State<SelectedItem> {
                                 );
                               });
                         }
-                        return Center(
+                        return const Center(
                             child: CircularProgressIndicator(
                           color: AppTheme.warnaHijau,
                         ));

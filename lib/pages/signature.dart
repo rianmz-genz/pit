@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +7,8 @@ import 'package:signature/signature.dart';
 import 'package:pit/pages/signaturePreview.dart';
 
 class SignaturePage extends StatefulWidget {
+  const SignaturePage({super.key});
+
   @override
   _SignaturePageState createState() => _SignaturePageState();
 }
@@ -33,7 +34,7 @@ class _SignaturePageState extends State<SignaturePage> {
 
   @override
   Widget build(BuildContext context) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+        data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
         child: Scaffold(
           body: Column(
             children: <Widget>[
@@ -65,7 +66,7 @@ class _SignaturePageState extends State<SignaturePage> {
         setOrientation(newOrientation);
       },
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -99,7 +100,7 @@ class _SignaturePageState extends State<SignaturePage> {
 
   Widget buildCheck(BuildContext context) => IconButton(
         iconSize: 36,
-        icon: Icon(Icons.check, color: AppTheme.warnaHijau),
+        icon: const Icon(Icons.check, color: AppTheme.warnaHijau),
         onPressed: () async {
           if (controller!.isNotEmpty) {
             final signature = await exportSignature();

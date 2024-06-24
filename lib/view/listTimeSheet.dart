@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +18,11 @@ class listTimesheet extends StatefulWidget {
   int? timeServer;
   String? statusTask;
   listTimesheet(
-      {this.taskId, this.timeRecord, this.statusTask, this.timeServer});
+      {super.key,
+      this.taskId,
+      this.timeRecord,
+      this.statusTask,
+      this.timeServer});
   @override
   _listTimesheetState createState() => _listTimesheetState();
 }
@@ -144,7 +147,7 @@ class _listTimesheetState extends State<listTimesheet> {
   // }
 
   @override
-  static GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  static final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController deskripsiController = TextEditingController();
   Timer? sendTimSht;
   Connection objCekConnection = Connection();
@@ -157,10 +160,10 @@ class _listTimesheetState extends State<listTimesheet> {
 
     String userid = await boxdata.getLoginCredential(param: "userId");
 
-    var box_openListTimesheet = await Hive.openBox("box_listTimesheet");
+    var boxOpenlisttimesheet = await Hive.openBox("box_listTimesheet");
 
-    if (box_openListTimesheet.isNotEmpty) {
-      catchData = box_openListTimesheet.get(userid);
+    if (boxOpenlisttimesheet.isNotEmpty) {
+      catchData = boxOpenlisttimesheet.get(userid);
       print("catchData");
       print(catchData);
 
@@ -183,10 +186,10 @@ class _listTimesheetState extends State<listTimesheet> {
           onWillPop: () async {
             return false;
           },
-          child: Dialog(
+          child: const Dialog(
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 CircularProgressIndicator(),
                 Text("Loading"),
               ],
@@ -208,7 +211,8 @@ class _listTimesheetState extends State<listTimesheet> {
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context)
+          .copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -239,7 +243,7 @@ class _listTimesheetState extends State<listTimesheet> {
                           borderRadius: BorderRadius.circular(10),
                           color: Colors.white,
                         ),
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(24),
                         margin: const EdgeInsets.all(10),
                         child: Column(
                           children: [
@@ -320,7 +324,7 @@ class _listTimesheetState extends State<listTimesheet> {
                             ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                primary: AppTheme.warnaHijau,
+                                backgroundColor: AppTheme.warnaHijau,
                                 minimumSize: const Size(29, 33),
                                 padding:
                                     const EdgeInsets.only(left: 43, right: 43),
@@ -365,10 +369,10 @@ class _listTimesheetState extends State<listTimesheet> {
 
                                   if (cekKoneksi.Status) {
                                     {
-                                      bool cekExistData_listUpload =
+                                      bool cekexistdataListupload =
                                           await boxdata
                                               .cekExistDataOnListUpload();
-                                      if (cekExistData_listUpload) {
+                                      if (cekexistdataListupload) {
                                         var dataBox = boxData(
                                             nameBox: "box_listUploadWorksheet");
                                         dataBox.addUploadListTask(
@@ -483,7 +487,6 @@ class _listTimesheetState extends State<listTimesheet> {
                                   //   });
                                   // }
                                   // } else {
-
                                 }
                               },
                               child: setUpButtonChild(),
@@ -510,11 +513,11 @@ class _listTimesheetState extends State<listTimesheet> {
                       itemCount: _length,
                       itemBuilder: (BuildContext context, int index) {
                         return Container(
-                          margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                           child: Card(
                             elevation: 0,
                             child: Container(
-                              color: Color(0xFFEEEEEE),
+                              color: const Color(0xFFEEEEEE),
                               child: ListTile(
                                 // trailing: Icon(Icons.arrow_forward_ios),
                                 onTap: () async {
@@ -606,7 +609,7 @@ class _listTimesheetState extends State<listTimesheet> {
                         SizedBox(
                           height: MySize.getScaledSizeHeight(11),
                         ),
-                        Text(
+                        const Text(
                           "Data belum ada...",
                           style: TextStyle(
                               color: AppTheme.warnaAbuMuda, fontSize: 20),
@@ -614,7 +617,7 @@ class _listTimesheetState extends State<listTimesheet> {
                       ],
                     );
                   }
-                  return Center(
+                  return const Center(
                       child: CircularProgressIndicator(
                     color: AppTheme.warnaHijau,
                   ));

@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 
 import 'package:pit/model/mNetwork.dart';
@@ -25,7 +23,8 @@ class TaskListAdapter extends StatefulWidget {
   double Lat;
   double Lng;
 
-  TaskListAdapter({required this.Status, required this.Lat, required this.Lng});
+  TaskListAdapter(
+      {super.key, required this.Status, required this.Lat, required this.Lng});
 
   @override
   State<TaskListAdapter> createState() => _TaskListAdapterState();
@@ -63,11 +62,11 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
     //TODO cek lokasi di dalam "ambil pekerjaan"
 
     //init box
-    var box_AddDetail = Hive.box("box_detailPekerjaan");
+    var boxAdddetail = Hive.box("box_detailPekerjaan");
 
-    var box_AddList = Hive.box("box_listPekerjaan");
-    var box_OpenListPekerjaan = await Hive.openBox("box_listPekerjaan");
-    var box_OpenHistoryPekerjaan = await Hive.openBox("box_historyPekerjaan");
+    var boxAddlist = Hive.box("box_listPekerjaan");
+    var boxOpenlistpekerjaan = await Hive.openBox("box_listPekerjaan");
+    var boxOpenhistorypekerjaan = await Hive.openBox("box_historyPekerjaan");
 
     if (widget.Status == "Pending") {
       updateDasboard.addDataDashboard(
@@ -75,20 +74,15 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
 
       List<dynamic> dataPendingShow = [];
       var listUploadWorksheet = await Hive.openBox("box_listUploadWorksheet");
-      if (box_OpenListPekerjaan.isNotEmpty) {
+      if (boxOpenlistpekerjaan.isNotEmpty) {
         List<dynamic> datalistPekerjaan =
-            List.from(box_OpenListPekerjaan.get(userid) ?? []);
-        if (datalistPekerjaan != null && datalistPekerjaan.length != 0) {
+            List.from(boxOpenlistpekerjaan.get(userid) ?? []);
+        if (datalistPekerjaan.isNotEmpty) {
           if (listUploadWorksheet.isNotEmpty) {
             List<dynamic> datalistUpload = listUploadWorksheet.get(userid);
-            if (datalistUpload != null && datalistUpload.length != 0) {
-              // print("ini adaw");
-
+            if (datalistUpload.isNotEmpty) {
               for (var valLP in datalistPekerjaan) {
-                // print(valLP);
                 for (var valUW in datalistUpload) {
-                  // print("valUW");
-                  // print(valUW);
                   if (valLP['data']['id'].toString() ==
                           valUW['taskid'].toString() ||
                       valLP['data']['task_status'] == "Completed") {
@@ -100,19 +94,14 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                         param: 'taskPendingKirim', tambah: true);
                     break;
                   }
-                  // break;
                 }
               }
-              // print("dataPendingShow");
-              // print(dataPendingShow);
             } else {
               for (var valLP in datalistPekerjaan) {
                 if (valLP['data']['task_status'] == "Completed") {
                   dataPendingShow.insert(0, valLP['data']);
                   statusTask.add("Pending");
                   dataStsWrkShtServer.add(valLP['data']['status_worksheet']);
-                  // print("dataPendingShow jika list upload kosong");
-                  print("dataPendingShow1");
                 }
               }
             }
@@ -122,8 +111,6 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                 dataPendingShow.insert(0, valLP['data']);
                 statusTask.add("Pending");
                 dataStsWrkShtServer.add(valLP['data']['status_worksheet']);
-                // print("dataPendingShow jika list upload kosong");
-                print("dataPendingShow");
               }
             }
           }
@@ -183,7 +170,7 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
         //ini sortir by waktu
 
         if ((urutkan ?? "").toLowerCase() == "waktu") {
-          lstResult.forEach((element) {
+          for (var element in lstResult) {
             if (element['pending_time'].contains(" Hari lalu")) {
               element["compare_time"] = double.parse(
                       element['pending_time'].replaceAll(" Hari lalu", "")) *
@@ -193,13 +180,12 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                       element['pending_time'].replaceAll(" Jam lalu", "")) *
                   1;
             }
-          });
+          }
 
           lstResult.sort((a, b) {
             return (a['compare_time']).compareTo(b['compare_time']);
           });
         }
-        print('ini dia');
         return lstResult;
       }
       if (widget.Status == "Open") {
@@ -210,7 +196,6 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
             Lng: latLong['long'] ?? 0);
 
         lstResult = objNetwork.Data;
-
         //TODO ini sortir dengan jarak (default)
 
         lstResult.sort((a, b) {
@@ -230,13 +215,11 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
         if (!checkloc) {
           return null;
         }
-        if (box_OpenListPekerjaan.isNotEmpty) {
-          print("status page/tab");
-          print(widget.Status);
-
+        if (boxOpenlistpekerjaan.isNotEmpty) {
           dataStsWrkShtServer = [];
           statusTask = [];
-          var viewData = List.from(box_OpenListPekerjaan.get(userid) ?? []);
+          var viewData = List.from(boxOpenlistpekerjaan.get(userid) ?? []);
+          print("viewDataaa ${viewData}");
           if (viewData.isNotEmpty) {
             for (var value in viewData) {
               if (value['StatusTask'] == 'OnGoing' &&
@@ -257,9 +240,6 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
             syncValue(widget.Status, userid, "syncvalue ongoing");
           }
           //
-
-          print("dataStsWrkShtServer");
-          print(dataStsWrkShtServer);
           return lstResult;
         } else {
           Network objNetwork = await objTaskNetwork.getTaskList(
@@ -285,7 +265,7 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                   values: dataResult);
               dataStsWrkShtServer = [];
               statusTask = [];
-              var viewData = List.from(box_OpenListPekerjaan.get(userid) ?? []);
+              var viewData = List.from(boxOpenlistpekerjaan.get(userid) ?? []);
               for (var value in viewData) {
                 if (value['StatusTask'] == 'OnGoing' &&
                     value['data']['task_status'] != 'Completed') {
@@ -294,9 +274,6 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                   dataStsWrkShtServer.add(value['data']['status_worksheet']);
                 }
               }
-
-              print("dataStsWrkShtServer");
-              print(dataStsWrkShtServer);
               return lstResult;
             }
           }
@@ -308,13 +285,11 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
         if (!checkloc) {
           return null;
         }
-        if (box_OpenHistoryPekerjaan.isNotEmpty) {
+        if (boxOpenhistorypekerjaan.isNotEmpty) {
           // alert("Online");
           statusTask = [];
           dataStsWrkShtServer = [];
-          var viewData = List.from(box_OpenHistoryPekerjaan.get(userid) ?? []);
-          print("viewData history");
-          print(viewData);
+          var viewData = List.from(boxOpenhistorypekerjaan.get(userid) ?? []);
           if (viewData.isNotEmpty) {
             for (var value in viewData) {
               if (value['StatusTask'] == 'Handed Off' ||
@@ -364,17 +339,14 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
               statusTask = [];
               // isi list ke view mode online
 
-              print("status page/tab");
-              print(widget.Status);
               //status= history
               if (widget.Status == 'History') {
                 // alert("Online");
                 statusTask = [];
                 dataStsWrkShtServer = [];
                 var viewData =
-                    List.from(box_OpenHistoryPekerjaan.get(userid) ?? []);
-                print("viewData");
-                print(viewData);
+                    List.from(boxOpenhistorypekerjaan.get(userid) ?? []);
+
                 for (var value in viewData) {
                   if (value['StatusTask'] == 'Handed Off' ||
                       value['StatusTask'] == 'Pending Upload' ||
@@ -428,33 +400,27 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
         await updateHistory.refreshHistoryTask(
             userid: userid, statusTask: widget.Status, values: dataResult);
       }
-      updateItem = true;
-      if (mounted) {
-        print("update Item Successed");
-        setState(() {});
-      }
+      setState(() {
+        updateItem = true;
+      });
     } else {
       final downMessage = PopupError();
       downMessage.showError(context, cekKoneksi, false, mounted);
     }
   }
-  // alert(String message) {
-  //   ScaffoldMessenger.of(context)
-  //       .showSnackBar(SnackBar(content: Text("Anda dalam kondisi $message")));
-  // }
 
   showAlertDialog(BuildContext context, bool cekLocation) {
     String Info = "";
-    var HowtoActivLoc = RichText(text: TextSpan(children: []));
+    var HowtoActivLoc = RichText(text: const TextSpan(children: []));
 
     if (!cekLocation) {
       Info = "Harap izinkan permission lokasi di device anda";
 
       HowtoActivLoc = RichText(
-        text: TextSpan(
+        text: const TextSpan(
           // Note: Styles for TextSpans must be explicitly defined.
           // Child text spans will inherit styles from parent
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16.0,
             color: Colors.black,
           ),
@@ -462,57 +428,48 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
             TextSpan(text: '\n\n\nCara aktifkan Location Permission :\n\n'),
             TextSpan(text: '1. pilih '),
             TextSpan(
-                text: 'Allow',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+                text: 'Allow', style: TextStyle(fontWeight: FontWeight.bold)),
             TextSpan(text: ' pada pop up Permission, atau\n\n'),
             //cara 2
             TextSpan(text: '2. pilih '),
             TextSpan(
                 text: 'Setting/Pengaturan',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            // TextSpan(text: '  atau '),
-            // TextSpan(
-            //     text: 'Pengaturan',
-            //     style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             TextSpan(text: ' pada Handphone anda, kemudian'),
             TextSpan(text: ' pilih '),
             TextSpan(
                 text: 'Aplikasi/Application',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             TextSpan(text: ', pilih '),
             TextSpan(
                 text: 'Permission',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             TextSpan(text: ', lalu geser tombol pada '),
             TextSpan(
                 text: 'Lokasi/Location',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            // TextSpan(text: ' atau '),
-            // TextSpan(
-            //     text: 'Location',
-            //     style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
       );
     }
 
     Widget continueButton = TextButton(
-      child: Text("kembali ke Beranda"),
+      child: const Text("kembali ke Beranda"),
       onPressed: () {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => HomeScreen(0),
+              builder: (context) => const HomeScreen(0),
             ));
       },
     );
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      insetPadding: EdgeInsets.symmetric(vertical: 130, horizontal: 30),
+      insetPadding: const EdgeInsets.symmetric(vertical: 130, horizontal: 30),
 
       // actionsPadding: EdgeInsets.only(top: 10),
-      title: Text(
+      title: const Text(
         "Peringatan",
         textAlign: TextAlign.center,
       ),
@@ -546,17 +503,7 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
     );
   }
 
-  @override
-  void initState() {
-    // TODO: init state
-    super.initState();
-    // markedPage();
-    // checkLoc();
-    // addDataDashboard();
-  }
-
   markedPage() async {
-    print('marked page was run');
     final BoxData = boxData(nameBox: "box_MarkedPage");
 
     if (widget.Status == "Open") {
@@ -589,100 +536,6 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
     latLong = {"lat": dataLat, "long": dataLong};
     return true;
   }
-
-  // Future<bool> getDetail(int taskid) async {
-  //   // print(taskid);
-  //   TaskNetwork objTaskNetwork = TaskNetwork();
-  //   Connection objCekConnection = Connection();
-  //   bool cekKoneksi = await objCekConnection.CheckConnection();
-  //   if (cekKoneksi) {
-  //     Network objNetwork = await objTaskNetwork.getTaskDetail(TaskId: taskid);
-  //     if (!objNetwork.Status) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(content: Text(objNetwork.Message.toString())));
-  //     } else {
-  //       var result = objNetwork.Data;
-  //       // print(result);
-  //       // print("sampe sini dip");
-  //       var box_AddDetail = Hive.box("box_detailPekerjaan");
-  //       var box_DetailList = await Hive.openBox("box_detailPekerjaan");
-  //       final data = box_DetailList.get(taskid.toString());
-  //
-  //       if (box_DetailList.isNotEmpty) {
-  //         if (data == null) {
-  //           box_AddDetail.put(taskid.toString(), result);
-  //           // return result;
-  //         } else {
-  //           // use data
-  //           result.forEach((i, value) {
-  //             if (value != null && value != false && value != "") {
-  //               data[i] = result[i];
-  //             }
-  //           });
-  //           box_AddDetail.put(taskid.toString(), data);
-  //         }
-  //       } else {
-  //         box_AddDetail.put(taskid.toString(), result);
-  //       }
-  //       // box_AddList.clear();
-  //       // box_AddDetail.clear();
-  //       //
-  //       var datas = objNetwork.Data;
-  //       await getFormWorksheet(datas['id']);
-  //     }
-  //   }
-  //   return true;
-  // }
-  //
-  // Future<bool> getFormWorksheet(int taskid) async {
-  //   Preferences pref = Preferences();
-  //   String userid = await pref.getUserId();
-  //   WorksheetNetwork objWorksheetNetwork = WorksheetNetwork();
-  //   Connection objCekConnection = Connection();
-  //   bool cekKoneksi = await objCekConnection.CheckConnection();
-  //   var WorksheetForm = await Hive.openBox("box_worksheetform");
-  //   var box_AddWorksheetForm = Hive.box("box_worksheetform");
-  //   if (WorksheetForm.isNotEmpty) {
-  //     var data = WorksheetForm.get(taskid.toString());
-  //     if (data == null) {
-  //       if (cekKoneksi) {
-  //         Network objNetwork =
-  //             await objWorksheetNetwork.getWorksheetForm(TaskId: taskid);
-  //         if (!objNetwork.Status) {
-  //           print("gadapet ni worksheet form nya");
-  //         } else {
-  //           box_AddWorksheetForm.put(taskid.toString(), objNetwork.Data);
-  //           await getValueWork(taskid, int.parse(userid));
-  //         }
-  //       }
-  //     }
-  //   } else {
-  //     if (cekKoneksi) {
-  //       Network objNetwork =
-  //           await objWorksheetNetwork.getWorksheetForm(TaskId: taskid);
-  //       if (!objNetwork.Status) {
-  //         print("gadapet ni worksheet form nya");
-  //       } else {
-  //         box_AddWorksheetForm.put(taskid.toString(), objNetwork.Data);
-  //         await getValueWork(taskid, int.parse(userid));
-  //       }
-  //     }
-  //   }
-  //   return true;
-  // }
-  //
-  // Future<bool> getValueWork(int taskid, int userid) async {
-  //   WorksheetNetwork objWorksheetNetwork = WorksheetNetwork();
-  //   Network objLoadNetwork = await objWorksheetNetwork.LoadWorksheetForm(
-  //       userId: userid, taskId: taskid);
-  //   if (!objLoadNetwork.Status) {
-  //     print("getValueWork");
-  //     print(objLoadNetwork.Status);
-  //   } else {
-  //     print("getValueWork berhasil");
-  //   }
-  //   return true;
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -740,14 +593,6 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                               ),
                             ) ??
                             urutkan;
-                        // if (urutkan == 'Alfabet Z-A (Default)') {
-                        //   sortZA.sort((b, a) {
-                        //     return a['name']
-                        //         .toLowerCase()
-                        //         .compareTo(b['name'].toLowerCase());
-                        //   });
-                        // }
-                        setState(() {});
                       },
                       child: Container(
                         padding: const EdgeInsets.only(
@@ -761,8 +606,8 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                                     fontFamily: 'OpenSans',
                                     fontSize: 15)),
                             urutkan != null
-                                ? Text("${urutkan}",
-                                    style: TextStyle(
+                                ? Text(urutkan,
+                                    style: const TextStyle(
                                         color: AppTheme.warnaHijau,
                                         fontFamily: 'OpenSans',
                                         fontSize: 15))
@@ -806,9 +651,6 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
               } else {
                 final downMessage = PopupError();
                 downMessage.showError(context, cekKoneksi, true, mounted);
-                // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                //     content:
-                //         Text("anda tidak terhubung ke jaringan internet")));
               }
             },
             child: FutureBuilder<dynamic>(
@@ -817,10 +659,7 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                 if (snapshot.hasData) {
                   List<dynamic> lstBook = snapshot.data!;
                   int _length = snapshot.data!.length;
-
-                  print("_length");
-                  print(snapshot.data!.length);
-                  // print(lstBook);
+                  print("snapshot.hasData ${snapshot.data}");
                   if (snapshot.data!.length == 0) {
                     return Center(
                       child: Column(
@@ -842,48 +681,20 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                       ),
                     );
                   }
-                  // print(_length);
 
                   return Column(
                     children: [
-                      // TextFormField(
-                      //   controller: keywordController,
-                      //
-                      //   onChanged: (data) {
-                      //     _onSearchChanged(data);
-                      //   },
-                      //   style: TextStyle(
-                      //       fontSize: 15,
-                      //       fontFamily: 'OpenSans',
-                      //       color: Color(0xFF2C2948)),
-                      //   maxLines: 1,
-                      //   // max baris
-                      //
-                      //   decoration: InputDecoration(
-                      //     prefixIcon: Icon(
-                      //       Icons.search,
-                      //     ),
-                      //     contentPadding:
-                      //         EdgeInsets.only(left: 29.0, right: 10.0),
-                      //     hintText: 'Cari Berdasarkan Judul / Customer',
-                      //     hintStyle: TextStyle(
-                      //         // fontStyle: FontStyle.italic,
-                      //         fontFamily: 'OpenSans',
-                      //         fontSize: 15),
-                      //     focusColor: Colors.white70,
-                      //   ),
-                      // ),
                       Expanded(
                         child: ListView.builder(
                           // reverse: true,
                           itemCount: _length,
                           itemBuilder: (BuildContext context, int index) {
                             return Container(
-                              margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                               child: Card(
                                 elevation: 0,
                                 child: Container(
-                                  color: Color(0xFFEEEEEE),
+                                  color: const Color(0xFFEEEEEE),
                                   child: ListTile(
                                     // trailing: Icon(Icons.arrow_forward_ios),
                                     onTap: () async {
@@ -896,8 +707,6 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                                               dataStsWrkShtServer[index];
                                         }
                                       }
-                                      // print("statusTask ditesting");
-                                      // print(statusTask);
                                       if (statusTask.isNotEmpty &&
                                           (statusTask != "Completed" ||
                                               statusTask != "Pending Upload")) {
@@ -913,7 +722,6 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                                               0),
                                         ),
                                       );
-                                      setState(() {});
                                     },
                                     title: Row(
                                       mainAxisAlignment:
@@ -931,11 +739,7 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.w700,
                                                     color: Color(0xFF1F1F21),
-                                                    // overflow: TextOverflow.ellipsis
-                                                  )
-                                                  // AppTheme.OpenSans700(
-                                                  //     15, Color(0xFF1F1F21))
-                                                  ),
+                                                  )),
                                               Text(
                                                 lstBook[index]["customer"] ??
                                                     "",
@@ -988,45 +792,11 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                                                       fontSize: 15,
                                                       fontFamily: 'OpenSans',
                                                       color: Colors.black)),
-
-                                            // widget.Status != "Open"
-                                            //     ? Text(
-                                            //         statusTask[index] == "OnGoing"
-                                            //             ? (lstBook[index]
-                                            //                         ["distance"] !=
-                                            //                     null
-                                            //                 ? (lstBook[index]
-                                            //                             ["distance"]
-                                            //                         .toString() +
-                                            //                     " KM")
-                                            //                 : "0 KM")
-                                            //             : (statusTask[index]
-                                            //                     .toString()),
-                                            //         style: TextStyle(
-                                            //             fontSize: 15,
-                                            //             fontFamily: 'OpenSans',
-                                            //             color: Colors.black),
-                                            //       )
-                                            //     : Text(
-                                            //         (lstBook[index]["distance"] !=
-                                            //                 null
-                                            //             ? (lstBook[index]["distance"]
-                                            //                     .toString() +
-                                            //                 " KM")
-                                            //             : "0 KM"),
-                                            //         style: TextStyle(
-                                            //             fontSize: 15,
-                                            //             fontFamily: 'OpenSans',
-                                            //             color: Colors.black),
-                                            //       ),
                                             Text(
-                                              lstBook[index]["pending_time"] ==
-                                                      null
-                                                  ? ""
-                                                  : lstBook[index]
-                                                      ["pending_time"],
+                                              lstBook[index]["pending_time"] ??
+                                                  "",
                                               style: AppTheme.OpenSans400(
-                                                  12, Color(0xFF9E9E9E)),
+                                                  12, const Color(0xFF9E9E9E)),
                                             ),
                                           ],
                                         ),
@@ -1043,7 +813,7 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                   );
                 }
 
-                return Center(
+                return const Center(
                     child: CircularProgressIndicator(
                   color: AppTheme.warnaHijau,
                 ));

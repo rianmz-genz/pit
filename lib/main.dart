@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:isolate';
 import 'dart:math';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -97,16 +96,16 @@ updateTriggerNotif({bool param = false}) async {
   }
   await Hive.openBox("box_loncengNotif");
 
-  var openBox_locengNotif = await Hive.openBox("box_loncengNotif");
+  var openboxLocengnotif = await Hive.openBox("box_loncengNotif");
 
-  if (openBox_locengNotif.isOpen) {
+  if (openboxLocengnotif.isOpen) {
     String userid = "";
     final getUserid = boxData(nameBox: "box_setLoginCredential");
     userid = await getUserid.getLoginCredential(param: "userId");
-    var update_locengNotif = Hive.box("box_loncengNotif");
+    var updateLocengnotif = Hive.box("box_loncengNotif");
     Map data = {"loncengNotif": param};
-    if (update_locengNotif.isNotEmpty) {
-      update_locengNotif.put(userid, data);
+    if (updateLocengnotif.isNotEmpty) {
+      updateLocengnotif.put(userid, data);
     }
   }
   if (Hive.isBoxOpen("box_loncengNotif")) {
@@ -147,17 +146,15 @@ Future _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   userid = await getUserid.getLoginCredential(param: "userId");
   TaskNetwork objTaskNetwork = TaskNetwork();
 
-  if (message != null) {
-    if (message.data['name'] != null && message.data['customer'] != null) {
-      print('popup munculllll');
-      var rng = Random();
-      NotificationApi.showNotification(
-          id: rng.nextInt(100),
-          title: "${message.data['name']}",
-          body:
-              "${message.data['customer']} Jarak ${message.data['distance']} KM",
-          payload: message.data['id']);
-    }
+  if (message.data['name'] != null && message.data['customer'] != null) {
+    print('popup munculllll');
+    var rng = Random();
+    NotificationApi.showNotification(
+        id: rng.nextInt(100),
+        title: "${message.data['name']}",
+        body:
+            "${message.data['customer']} Jarak ${message.data['distance']} KM",
+        payload: message.data['id']);
   }
 
   print("message.notification nambilin data di background ketika app di close");
@@ -286,7 +283,7 @@ void main() async {
 
   // FirebaseMessaging.onBackgroundMessage(backgroundHandler);
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -301,6 +298,8 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 // }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   // const MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
@@ -327,12 +326,12 @@ class MyApp extends StatelessWidget {
               }
 
               if (bolLoginValid) {
-                return HomeScreen(0);
+                return const HomeScreen(0);
               } else {
-                return LoginPhone();
+                return const LoginPhone();
               }
             } else {
-              return Center(
+              return const Center(
                   child: CircularProgressIndicator(
                 color: AppTheme.warnaHijau,
               ));
@@ -340,7 +339,7 @@ class MyApp extends StatelessWidget {
           }
 
           // print("circular");
-          return Center(
+          return const Center(
               child: CircularProgressIndicator(
             color: AppTheme.warnaHijau,
           ));

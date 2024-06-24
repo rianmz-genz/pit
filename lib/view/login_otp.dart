@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +13,6 @@ import 'package:pit/model/mNetwork.dart';
 import 'package:pit/network/task.dart';
 import 'package:pit/network/user.dart';
 import 'package:pit/utils/boxData.dart';
-import 'package:pit/utils/popUpError.dart';
 import 'package:pit/view/akun_new.dart';
 import 'package:pit/view/homescreen.dart';
 
@@ -27,7 +25,7 @@ class LoginOtp extends StatelessWidget {
   String Type;
   String Phone;
 
-  LoginOtp({required this.Type, required this.Phone});
+  LoginOtp({super.key, required this.Type, required this.Phone});
 
   final myNumberController = TextEditingController();
   StreamController<ErrorAnimationType> errorController =
@@ -37,7 +35,8 @@ class LoginOtp extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData themeData = Theme.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context)
+          .copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
@@ -48,19 +47,29 @@ class LoginOtp extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      Text(
-                        'Hampir selesai..',
-                        style: AppTheme.OpenSans600(31, Color(0xFF1C1939)),
+                      Image(
+                        width: MySize.getScaledSizeWidth(250), //160
+                        image: const AssetImage(
+                            'assets/images/logo_pit_elektronik.png'),
                       ),
                       SizedBox(
-                        height: 44 * MySize.scaleFactorHeight,
+                        height: 32,
+                      ),
+                      Text(
+                        'Hampir selesai..',
+                        style:
+                            AppTheme.OpenSans600(31, const Color(0xFF1C1939)),
+                      ),
+                      SizedBox(
+                        height: 32,
                       ),
                       RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
                           text:
                               'Mohon masukkan kode 4 digit yang terdaftar untuk anda ',
-                          style: AppTheme.OpenSans600(15, Color(0xFF1C1939)),
+                          style:
+                              AppTheme.OpenSans600(15, const Color(0xFF1C1939)),
                           // children: <TextSpan>[
                           //   TextSpan(
                           //       text: '+62 ' + Phone.replaceFirst("0", "", 0),
@@ -88,16 +97,16 @@ class LoginOtp extends StatelessWidget {
                             FilteringTextInputFormatter.digitsOnly
                           ], //
                           textStyle: AppTheme.OpenSans600LS(
-                              30, Color(0xFF1C1939), -0.43),
+                              30, const Color(0xFF1C1939), -0.43),
                           pinTheme: PinTheme(
                               shape: PinCodeFieldShape.underline,
                               fieldHeight: 47,
                               fieldWidth: 57,
                               activeFillColor: Colors.white,
-                              selectedColor: Color(0xFF00A09D),
+                              selectedColor: const Color(0xFF00A09D),
                               activeColor: const Color(0xFF1C1939),
                               inactiveColor: const Color(0xFF1C1939)),
-                          animationDuration: Duration(milliseconds: 300),
+                          animationDuration: const Duration(milliseconds: 300),
                           errorAnimationController: errorController,
                           controller: myNumberController,
                           onCompleted: (myNumberController) async {
@@ -116,26 +125,26 @@ class LoginOtp extends StatelessWidget {
                               // String strUserId = await boxdata.getLoginCredential(param: "userId") ?? "";
                               UserNetwork objUserNetwork = UserNetwork();
 
-                              var lat;
-                              var long;
+                              double lat;
+                              double long;
 
                               // if (cekKoneksi.Status) {
                               var addUserToken = Hive.box("box_usertoken");
-                              String user_token = "";
+                              String userToken = "";
 
                               await FirebaseMessaging.instance
                                   .getToken()
                                   .then((value) {
-                                user_token = value ?? "";
-                                addUserToken.put(Phone, user_token);
+                                userToken = value ?? "";
+                                addUserToken.put(Phone, userToken);
                               });
                               // print("user_token");
                               // print(user_token);
-                              print(user_token);
+                              print(userToken);
 
                               Network objNetwork =
                                   await objUserNetwork.getUserOtp(strSecretKey,
-                                      Phone, myNumberController, user_token, 1);
+                                      Phone, myNumberController, userToken, 1);
 
 //
 
@@ -152,9 +161,7 @@ class LoginOtp extends StatelessWidget {
                                 // print("lat long from page otp");
                                 // print(lat);
                                 // print(long);
-                                if (lat != null &&
-                                    long != null &&
-                                    objNetwork.Status) {
+                                if (objNetwork.Status) {
                                   UserNetwork objUserNetwork = UserNetwork();
                                   Network objNetworkGeo = await objUserNetwork
                                       .sendGeolocate(lat: lat, long: long);
@@ -164,7 +171,6 @@ class LoginOtp extends StatelessWidget {
                                     checkGeolocation = objNetworkGeo.Status;
                                     print(checkGeolocation);
                                     // print("geolocate keterima");
-
                                   } else {
                                     checkGeolocation = objNetworkGeo.Status;
                                     if (objNetwork.Message != null) {
@@ -192,7 +198,7 @@ class LoginOtp extends StatelessWidget {
                               }
 
                               //
-
+                              print("sampee siniii");
                               if (checkGeolocation) {
                                 Preferences pref = Preferences();
                                 await pref.SetUserActive(1);
@@ -200,7 +206,8 @@ class LoginOtp extends StatelessWidget {
                                   Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => AccountNew(),
+                                        builder: (context) =>
+                                            const AccountNew(),
                                       ));
                                 } else {
                                   masterNetwork objMasterProd = masterNetwork();
@@ -217,14 +224,15 @@ class LoginOtp extends StatelessWidget {
                                   int userID = int.parse(userId);
 
                                   await initDashBoard(userId);
-                                  await fillDashboard(userID, lat, long);
+                                  // await fillDashboard(userID, lat, long);
                                   await restartListUpload(userId);
                                   //count
 
                                   Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => HomeScreen(0),
+                                        builder: (context) =>
+                                            const HomeScreen(0),
                                       ));
                                 }
                               } else {
@@ -269,14 +277,6 @@ class LoginOtp extends StatelessWidget {
                       //         fontSize: 18),
                       //   ),
                       // ),
-                      SizedBox(
-                        height: 56 * MySize.scaleFactorHeight,
-                      ),
-                      Image(
-                        width: MySize.getScaledSizeWidth(250), //160
-                        image: const AssetImage(
-                            'assets/images/logo_pit_elektronik.png'),
-                      )
                     ],
                   ),
                 ),
@@ -341,12 +341,12 @@ class LoginOtp extends StatelessWidget {
     //     .getLoginCredential(
     //     param:
     //     "userId");
-    final box_OpenDataUpload = await Hive.openBox("box_listUploadWorksheet");
+    final boxOpendataupload = await Hive.openBox("box_listUploadWorksheet");
 
     bool checkdata = false;
-    if (box_OpenDataUpload.isNotEmpty) {
-      if (userId != null && userId != 0) {
-        final data = box_OpenDataUpload.get(userId) ?? [];
+    if (boxOpendataupload.isNotEmpty) {
+      if (userId != 0) {
+        final data = boxOpendataupload.get(userId) ?? [];
         if (data != null && data.length != 0) {
           for (var val in data) {
             val['upload'] = 0;
@@ -372,7 +372,7 @@ class LoginOtp extends StatelessWidget {
     await Hive.openBox("box_dashboard");
     final boxdata = boxData(nameBox: "box_setLoginCredential");
     var dataDasboard = {
-      "Date": "${tanggal}",
+      "Date": tanggal,
       "getPekerjaan": 0,
       "selesaiAll": 0,
       "selesaiPerDay": 0,
@@ -382,12 +382,12 @@ class LoginOtp extends StatelessWidget {
       "triggerRefresh": false
     };
 
-    var openbox_dashboard = await Hive.openBox("box_dashboard");
+    var openboxDashboard = await Hive.openBox("box_dashboard");
 
-    if (openbox_dashboard.isOpen) {
-      var insertBox_dashboard = Hive.box("box_dashboard");
-      if (openbox_dashboard.isNotEmpty) {
-        var dataDasboardDB = openbox_dashboard.get(userId);
+    if (openboxDashboard.isOpen) {
+      var insertboxDashboard = Hive.box("box_dashboard");
+      if (openboxDashboard.isNotEmpty) {
+        var dataDasboardDB = openboxDashboard.get(userId);
 
         if (dataDasboardDB != null) {
         } else {
@@ -395,10 +395,10 @@ class LoginOtp extends StatelessWidget {
 
           print('start dashboard');
           print(dataDasboard);
-          insertBox_dashboard.put(userId, dataDasboard);
+          insertboxDashboard.put(userId, dataDasboard);
         }
       } else {
-        insertBox_dashboard.put(userId, dataDasboard);
+        insertboxDashboard.put(userId, dataDasboard);
       }
     }
   }

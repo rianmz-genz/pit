@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:pit/model/mNetwork.dart';
@@ -33,9 +31,9 @@ class _NotifState extends State<Notif> {
   late var dataLat;
   late var dataLong;
   String readTimestamp(int timestamp) {
-    var now = new DateTime.now();
-    var format = new DateFormat('HH:mm a');
-    var date = new DateTime.fromMicrosecondsSinceEpoch(timestamp * 1000);
+    var now = DateTime.now();
+    var format = DateFormat('HH:mm a');
+    var date = DateTime.fromMicrosecondsSinceEpoch(timestamp * 1000);
     var diff = date.difference(now) * (-1);
 
     var time = '';
@@ -64,6 +62,7 @@ class _NotifState extends State<Notif> {
     }
   }
 
+  @override
   initState() {
     super.initState();
     closeBoxes();
@@ -106,20 +105,20 @@ class _NotifState extends State<Notif> {
     //   },
     // );
     Widget continueButton = TextButton(
-      child: Text("Ya"),
+      child: const Text("Ya"),
       onPressed: () async {
         //TODO delete message
         print('clicked trash');
         print(idmessage);
         await Hive.openBox("box_listMessages");
-        final box_OpenListMessage = await Hive.openBox("box_listMessages");
+        final boxOpenlistmessage = await Hive.openBox("box_listMessages");
         // final box_AddMessage = Hive.box("box_listMessages");
         final saveListNotif = boxData(nameBox: "box_listMessages");
-        if (box_OpenListMessage.isOpen) {
+        if (boxOpenlistmessage.isOpen) {
           final boxdata = boxData(nameBox: "box_setLoginCredential");
 
           String userId = await boxdata.getLoginCredential(param: "userId");
-          var dataLocal = box_OpenListMessage.get(userId);
+          var dataLocal = boxOpenlistmessage.get(userId);
           if (dataLocal.isNotEmpty) {
             if (idmessage == "all") {
               final cekdata = await saveListNotif.UpdateListNotif([]);
@@ -152,7 +151,7 @@ class _NotifState extends State<Notif> {
       },
     );
     Widget cancelButton = TextButton(
-      child: Text("Tidak"),
+      child: const Text("Tidak"),
       onPressed: () {
         Navigator.of(context).pop();
       },
@@ -212,14 +211,14 @@ class _NotifState extends State<Notif> {
       }
     } catch (e) {}
     await Hive.openBox("box_listMessages");
-    final box_OpenListMessage = await Hive.openBox("box_listMessages");
+    final boxOpenlistmessage = await Hive.openBox("box_listMessages");
 
-    if (box_OpenListMessage.isOpen) {
+    if (boxOpenlistmessage.isOpen) {
       print("box notif is open");
-      final box_AddMessage = Hive.box("box_listMessages");
+      final boxAddmessage = Hive.box("box_listMessages");
 
-      if (box_OpenListMessage.isNotEmpty) {
-        var dataLocal = List.from(box_OpenListMessage.get(userId) ?? []);
+      if (boxOpenlistmessage.isNotEmpty) {
+        var dataLocal = List.from(boxOpenlistmessage.get(userId) ?? []);
 
         print("dataLocal");
         print(dataLocal);
@@ -378,7 +377,7 @@ class _NotifState extends State<Notif> {
 
   showAlertDialog(BuildContext context, bool cekLocation) {
     String Info = "";
-    var HowtoActivLoc = RichText(text: TextSpan(children: []));
+    var HowtoActivLoc = RichText(text: const TextSpan(children: []));
 
     if (!cekLocation) {
       Info = "Harap izinkan permission lokasi di device anda";
@@ -387,7 +386,7 @@ class _NotifState extends State<Notif> {
         text: const TextSpan(
           // Note: Styles for TextSpans must be explicitly defined.
           // Child text spans will inherit styles from parent
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16.0,
             color: Colors.black,
           ),
@@ -396,13 +395,13 @@ class _NotifState extends State<Notif> {
             TextSpan(text: '1. pilih '),
             TextSpan(
                 text: 'Allow',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             TextSpan(text: ' pada pop up Permission, atau\n\n'),
             //cara 2
             TextSpan(text: '2. pilih '),
             TextSpan(
                 text: 'Setting/Pengaturan',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             // TextSpan(text: '  atau '),
             // TextSpan(
             //     text: 'Pengaturan',
@@ -411,15 +410,15 @@ class _NotifState extends State<Notif> {
             TextSpan(text: ' pilih '),
             TextSpan(
                 text: 'Aplikasi/Application',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             TextSpan(text: ', pilih '),
             TextSpan(
                 text: 'Permission',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             TextSpan(text: ', lalu geser tombol pada '),
             TextSpan(
                 text: 'Lokasi/Location',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             // TextSpan(text: ' atau '),
             // TextSpan(
             //     text: 'Location',
@@ -430,12 +429,12 @@ class _NotifState extends State<Notif> {
     }
 
     Widget continueButton = TextButton(
-      child: Text("kembali ke Beranda"),
+      child: const Text("kembali ke Beranda"),
       onPressed: () {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => HomeScreen(0),
+              builder: (context) => const HomeScreen(0),
             ));
       },
     );
@@ -498,7 +497,7 @@ class _NotifState extends State<Notif> {
   Widget build(BuildContext context) {
     MySize().init(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
           appBar: AppBar(
             actions: [
@@ -506,8 +505,8 @@ class _NotifState extends State<Notif> {
                 onTap: () async {
                   alertDelete(context, "all");
                 },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Icon(
                       Icons.delete,
@@ -527,7 +526,7 @@ class _NotifState extends State<Notif> {
               //     MaterialPageRoute(
               //       builder: (context) => HomeScreen(0),
               //     )),
-              icon: Icon(Icons.keyboard_arrow_left, size: 40),
+              icon: const Icon(Icons.keyboard_arrow_left, size: 40),
             ),
             automaticallyImplyLeading: true,
             centerTitle: true,
@@ -567,7 +566,7 @@ class _NotifState extends State<Notif> {
                           SizedBox(
                             height: MySize.getScaledSizeHeight(11),
                           ),
-                          Text(
+                          const Text(
                             "Data tidak ada",
                             style: TextStyle(
                                 color: AppTheme.warnaAbuMuda, fontSize: 20),
@@ -631,13 +630,13 @@ class _NotifState extends State<Notif> {
                                         print(lstMsg[index]['data']['direct']
                                             .runtimeType);
                                         bool handoff = false;
-                                        dynamic task_status;
-                                        bool fsm_done = false;
+                                        dynamic taskStatus;
+                                        bool fsmDone = false;
                                         if (lstMsg[index]['data']['direct'] ==
                                             true) {
-                                          task_status = "On Going";
+                                          taskStatus = "On Going";
                                         } else {
-                                          task_status = "false";
+                                          taskStatus = "false";
                                         }
                                         if (lstMsg[index]['data']['handoff']
                                                 .runtimeType ==
@@ -656,9 +655,9 @@ class _NotifState extends State<Notif> {
                                           if (lstMsg[index]['data']
                                                   ['handoff'] ==
                                               "true") {
-                                            fsm_done = true;
+                                            fsmDone = true;
                                           } else {
-                                            fsm_done = false;
+                                            fsmDone = false;
                                           }
                                         }
 
@@ -666,7 +665,7 @@ class _NotifState extends State<Notif> {
                                             id: int.parse(
                                                 lstMsg[index]['data']['id']),
                                             name: lstMsg[index]['data']['name'],
-                                            fsm_done: fsm_done,
+                                            fsm_done: fsmDone,
                                             distance: int.parse(lstMsg[index]
                                                 ['data']['distance']),
                                             status_worksheet: lstMsg[index]
@@ -678,7 +677,7 @@ class _NotifState extends State<Notif> {
                                                 ['customer'],
                                             pending_time: lstMsg[index]['data']
                                                 ['pending_time'],
-                                            task_status: task_status);
+                                            task_status: taskStatus);
 
                                         dynamic Task =
                                             Map.from(taskModel.getTask());
@@ -874,7 +873,7 @@ class _NotifState extends State<Notif> {
                                               overflow: TextOverflow.ellipsis,
                                               textAlign: TextAlign.start,
                                               style: AppTheme.OpenSans400(
-                                                  14, Color(0xFF808080)),
+                                                  14, const Color(0xFF808080)),
                                             ),
                                           ),
                                           SizedBox(
@@ -890,7 +889,7 @@ class _NotifState extends State<Notif> {
                                                       ['distance'] +
                                                   " KM",
                                               style: AppTheme.OpenSans400(
-                                                  14, Color(0xFF808080)),
+                                                  14, const Color(0xFF808080)),
                                             ),
                                           ),
                                         ],
@@ -942,7 +941,7 @@ class _NotifState extends State<Notif> {
                                             readTimestamp(
                                                 lstMsg[index]['time']),
                                             style: AppTheme.OpenSans400(
-                                                14, Color(0xFF808080)),
+                                                14, const Color(0xFF808080)),
                                           ),
                                         ),
                                       ],
@@ -951,7 +950,7 @@ class _NotifState extends State<Notif> {
                                 ],
                               ),
 
-                              Divider(color: Colors.grey),
+                              const Divider(color: Colors.grey),
                               // Text(
                               //   "Tipe Perkerjaan : Unit Besar",
                               //   textAlign: TextAlign.start,
@@ -992,7 +991,7 @@ class _NotifState extends State<Notif> {
                   );
                 }
 
-                return Center(
+                return const Center(
                     child: CircularProgressIndicator(
                   color: AppTheme.warnaHijau,
                 ));

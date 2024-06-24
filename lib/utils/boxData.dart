@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
-import 'package:pit/view/task_worksheet.dart';
 
 import '../model/mNetwork.dart';
 import '../network/CheckDataConnection.dart';
@@ -34,22 +31,20 @@ class boxData {
 
     String userId = await boxdata.getLoginCredential(param: "userId");
 
-    late var notif;
-    var openBox_notif = await Hive.openBox("box_loncengNotif");
-    if (openBox_notif.isOpen) {
-      if (openBox_notif.isNotEmpty) {
-        notif = Map.from(openBox_notif.get(userId) ?? {"loncengNotif": false});
+    late Map notif;
+    var openboxNotif = await Hive.openBox("box_loncengNotif");
+    if (openboxNotif.isOpen) {
+      if (openboxNotif.isNotEmpty) {
+        notif = Map.from(openboxNotif.get(userId) ?? {"loncengNotif": false});
         //08082022
         // Hive.box("box_loncengNotif").close();
         if (notif == {}) {
-          return notif;
+          return true;
         }
         print("valDashboard cek notif");
         print(notif);
-        if (notif != null) {
-          if (notif[param] != false) {
-            return notif[param];
-          }
+        if (notif[param] != false) {
+          return notif[param];
         }
         // return false;
       }
@@ -63,18 +58,18 @@ class boxData {
   }
 
   Future<void> saveTimer(Map<String, dynamic> timer) async {
-    var openBox_timerWorksheet = await Hive.openBox(nameBox!);
-    var add_TimerWorksheet = await Hive.box(nameBox!);
+    var openboxTimerworksheet = await Hive.openBox(nameBox!);
+    var addTimerworksheet = Hive.box(nameBox!);
     final boxdata = boxData(nameBox: "box_setLoginCredential");
 
     String userId = await boxdata.getLoginCredential(param: "userId");
-    if (openBox_timerWorksheet.isOpen) {
-      if (openBox_timerWorksheet.isNotEmpty) {
+    if (openboxTimerworksheet.isOpen) {
+      if (openboxTimerworksheet.isNotEmpty) {
         print('save timer');
         print(timer);
         bool checkData = false;
-        var data = List.from(openBox_timerWorksheet.get(userId) ?? []);
-        if (data != null && data.isNotEmpty) {
+        var data = List.from(openboxTimerworksheet.get(userId) ?? []);
+        if (data.isNotEmpty) {
           print('save timer 1');
           for (int i = 0; i < data.length; i++) {
             if (data[i]['taskid'] == timer['taskid']) {
@@ -90,38 +85,38 @@ class boxData {
           if (checkData) {
             print('save timer 4');
             print(data);
-            add_TimerWorksheet.delete(userId);
-            add_TimerWorksheet.put(userId, data);
+            addTimerworksheet.delete(userId);
+            addTimerworksheet.put(userId, data);
           } else {
             print('save timer 5');
             data.insert(0, timer);
-            add_TimerWorksheet.delete(userId);
-            add_TimerWorksheet.put(userId, data);
+            addTimerworksheet.delete(userId);
+            addTimerworksheet.put(userId, data);
           }
         } else {
           print('save timer 6');
-          add_TimerWorksheet.delete(userId);
-          add_TimerWorksheet.put(userId, [timer]);
+          addTimerworksheet.delete(userId);
+          addTimerworksheet.put(userId, [timer]);
         }
       } else {
         print('save timer 7');
-        add_TimerWorksheet.delete(userId);
-        add_TimerWorksheet.put(userId, [timer]);
+        addTimerworksheet.delete(userId);
+        addTimerworksheet.put(userId, [timer]);
       }
-      await openBox_timerWorksheet.compact();
+      await openboxTimerworksheet.compact();
     }
   }
 
   Future<void> deleteTimer({String? Taskid}) async {
-    var openBox_timerWorksheet = await Hive.openBox(nameBox!);
+    var openboxTimerworksheet = await Hive.openBox(nameBox!);
     final boxdata = boxData(nameBox: "box_setLoginCredential");
 
     String userId = await boxdata.getLoginCredential(param: "userId");
-    if (openBox_timerWorksheet.isOpen) {
-      var add_TimerWorksheet = Hive.box(nameBox!);
+    if (openboxTimerworksheet.isOpen) {
+      var addTimerworksheet = Hive.box(nameBox!);
 
-      if (openBox_timerWorksheet.isNotEmpty) {
-        var data = List.from(openBox_timerWorksheet.get(userId) ?? []);
+      if (openboxTimerworksheet.isNotEmpty) {
+        var data = List.from(openboxTimerworksheet.get(userId) ?? []);
         if (data.isNotEmpty) {
           for (var val in data) {
             if (val['taskid'] == Taskid) {
@@ -130,29 +125,29 @@ class boxData {
               break;
             }
           }
-          add_TimerWorksheet.delete(userId);
-          add_TimerWorksheet.put(userId, data);
+          addTimerworksheet.delete(userId);
+          addTimerworksheet.put(userId, data);
         } else {
           print('data ga ada');
         }
       }
-      await openBox_timerWorksheet.compact();
+      await openboxTimerworksheet.compact();
     }
   }
 
   Future<Map> getTimer(String? Taskid) async {
-    var openBox_timerWorksheet = await Hive.openBox(nameBox!);
+    var openboxTimerworksheet = await Hive.openBox(nameBox!);
     final boxdata = boxData(nameBox: "box_setLoginCredential");
 
     String userId = await boxdata.getLoginCredential(param: "userId");
-    if (openBox_timerWorksheet.isOpen) {
-      var add_TimerWorksheet = await Hive.box(nameBox!);
+    if (openboxTimerworksheet.isOpen) {
+      var addTimerworksheet = Hive.box(nameBox!);
 
-      if (openBox_timerWorksheet.isNotEmpty) {
-        List data = List.from(openBox_timerWorksheet.get(userId) ?? []);
+      if (openboxTimerworksheet.isNotEmpty) {
+        List data = List.from(openboxTimerworksheet.get(userId) ?? []);
         //08082022
         // add_TimerWorksheet.close();
-        if (data != null && data.isNotEmpty) {
+        if (data.isNotEmpty) {
           for (var val in data) {
             print(val);
             if (val['taskid'] == Taskid) {
@@ -172,36 +167,31 @@ class boxData {
   }
 
   Future<void> savingTimer_temporary({String? Taskid, List? Timer}) async {
-    var openBox_savingTimer_temporary = await Hive.openBox(nameBox!);
-    if (openBox_savingTimer_temporary.isOpen) {
-      var add_savingTimer_temporary = Hive.box(nameBox!);
+    var openboxSavingtimerTemporary = await Hive.openBox(nameBox!);
+    if (openboxSavingtimerTemporary.isOpen) {
+      var addSavingtimerTemporary = Hive.box(nameBox!);
 
-      add_savingTimer_temporary.put(Taskid, Timer);
-      await openBox_savingTimer_temporary.compact();
+      addSavingtimerTemporary.put(Taskid, Timer);
+      await openboxSavingtimerTemporary.compact();
     }
   }
 
   Future getTimer_temporary({String? Taskid}) async {
-    var openBox_savingTimer_temporary = await Hive.openBox(nameBox!);
-    if (openBox_savingTimer_temporary.isOpen) {
-      var add_savingTimer_temporary = await Hive.box(nameBox!);
+    var openboxSavingtimerTemporary = await Hive.openBox(nameBox!);
+    if (openboxSavingtimerTemporary.isOpen) {
+      var addSavingtimerTemporary = Hive.box(nameBox!);
 
-      if (openBox_savingTimer_temporary != null) {
-        final result =
-            List.from(openBox_savingTimer_temporary.get(Taskid) ?? []);
-        //08082022
-        // add_savingTimer_temporary.close();
-        return result;
-      } else {
-        return [];
-      }
+      final result = List.from(openboxSavingtimerTemporary.get(Taskid) ?? []);
+      //08082022
+      // add_savingTimer_temporary.close();
+      return result;
     }
   }
 
   Future<void> deleteTimer_temporary({String? Taskid}) async {
-    var openBox_savingTimer_temporary = await Hive.openBox(nameBox!);
-    var add_savingTimer_temporary = await Hive.box(nameBox!);
-    openBox_savingTimer_temporary.clear();
+    var openboxSavingtimerTemporary = await Hive.openBox(nameBox!);
+    var addSavingtimerTemporary = Hive.box(nameBox!);
+    openboxSavingtimerTemporary.clear();
   }
 
   Future<void> updateTriggerNotif({bool param = false}) async {
@@ -215,25 +205,21 @@ class boxData {
     }
     await Hive.openBox("box_loncengNotif");
 
-    var openBox_locengNotif = await Hive.openBox("box_loncengNotif");
+    var openboxLocengnotif = await Hive.openBox("box_loncengNotif");
     final boxdata = boxData(nameBox: "box_setLoginCredential");
     Map data = {"loncengNotif": param};
     String userId = await boxdata.getLoginCredential(param: "userId");
-    if (openBox_locengNotif.isOpen) {
+    if (openboxLocengnotif.isOpen) {
       print("box trigger notif is open");
-      var update_locengNotif = Hive.box("box_loncengNotif");
-      if (update_locengNotif.isNotEmpty) {
-        var datas = Map.from(openBox_locengNotif.get(userId));
-        if (datas != null) {
-          update_locengNotif.delete(userId);
-          update_locengNotif.put(userId, data);
-        } else {
-          update_locengNotif.put(userId, data);
-        }
+      var updateLocengnotif = Hive.box("box_loncengNotif");
+      if (updateLocengnotif.isNotEmpty) {
+        var datas = Map.from(openboxLocengnotif.get(userId));
+        updateLocengnotif.delete(userId);
+        updateLocengnotif.put(userId, data);
         print("data update norif");
         print(data);
       } else {
-        update_locengNotif.put(userId, data);
+        updateLocengnotif.put(userId, data);
       }
       // await openBox_locengNotif.compact();
     }
@@ -257,7 +243,7 @@ class boxData {
     final boxdata = boxData(nameBox: "box_setLoginCredential");
 
     String userId = await boxdata.getLoginCredential(param: "userId");
-    late var valDashboard;
+    late Map valDashboard;
 
     if (background) {
       if (Hive.isBoxOpen("box_dashboard")) {
@@ -266,13 +252,13 @@ class boxData {
     }
     await Hive.openBox("box_dashboard");
 
-    var openBox_dashboard = await Hive.openBox("box_dashboard");
+    var openboxDashboard = await Hive.openBox("box_dashboard");
 
-    if (openBox_dashboard.isOpen) {
-      var insertBox_dashboard = Hive.box("box_dashboard");
+    if (openboxDashboard.isOpen) {
+      var insertboxDashboard = Hive.box("box_dashboard");
       // print("buka ni");
-      if (openBox_dashboard.isNotEmpty) {
-        valDashboard = Map.from(openBox_dashboard.get(userId));
+      if (openboxDashboard.isNotEmpty) {
+        valDashboard = Map.from(openboxDashboard.get(userId));
         // print("valDashboard yg eror");
         // print(valDashboard);
         if (reset!) {
@@ -303,8 +289,8 @@ class boxData {
         }
         // print("valDashboard['$param']");
         // print(valDashboard['$param']);
-        insertBox_dashboard.delete(userId);
-        insertBox_dashboard.put(userId, valDashboard);
+        insertboxDashboard.delete(userId);
+        insertboxDashboard.put(userId, valDashboard);
       } else {
         // print('kesini apaya');
         // valDashboard = {
@@ -319,7 +305,7 @@ class boxData {
         // };
         // insertBox_dashboard.put("values", valDashboard);
       }
-      await openBox_dashboard.compact();
+      await openboxDashboard.compact();
     }
 
     if (background) {
@@ -333,17 +319,17 @@ class boxData {
     // print("add Data show Notif");
     // print(taskid);
     // print(message);
-    var box_showNotif = await Hive.openBox(nameBox!);
-    if (box_showNotif.isOpen) {
-      var addbox_showNotif = await Hive.box(nameBox!);
+    var boxShownotif = await Hive.openBox(nameBox!);
+    if (boxShownotif.isOpen) {
+      var addboxShownotif = Hive.box(nameBox!);
       Map saveData = {"taskid": taskid, "data": message};
       bool checkData = false;
-      if (box_showNotif.isNotEmpty) {
-        var data = List.from(box_showNotif.get("showNotif"));
+      if (boxShownotif.isNotEmpty) {
+        var data = List.from(boxShownotif.get("showNotif"));
 
         // print("data");
         // print(data);
-        if (data != null && data.isNotEmpty) {
+        if (data.isNotEmpty) {
           for (var val in data) {
             // print("val");
             // print(val);
@@ -358,9 +344,9 @@ class boxData {
           }
           if (checkData) {
             data.add(saveData);
-            var data_distinct = (data.toSet().toList()).toSet().toList();
-            addbox_showNotif.delete("showNotif");
-            addbox_showNotif.put("showNotif", data_distinct);
+            var dataDistinct = (data.toSet().toList()).toSet().toList();
+            addboxShownotif.delete("showNotif");
+            addboxShownotif.put("showNotif", dataDistinct);
           } else {
             // data.add(saveData);
             // addbox_showNotif.delete("showNotif");
@@ -368,26 +354,26 @@ class boxData {
           }
         } else {
           data.add(saveData);
-          var data_distinct = (data.toSet().toList()).toSet().toList();
-          addbox_showNotif.delete("showNotif");
-          addbox_showNotif.put("showNotif", data_distinct);
+          var dataDistinct = (data.toSet().toList()).toSet().toList();
+          addboxShownotif.delete("showNotif");
+          addboxShownotif.put("showNotif", dataDistinct);
         }
       } else {
-        var data_distinct = ([saveData].toSet().toList()).toSet().toList();
-        addbox_showNotif.put("showNotif", data_distinct);
+        var dataDistinct = ({saveData}.toList()).toSet().toList();
+        addboxShownotif.put("showNotif", dataDistinct);
       }
     }
   }
 
   Future<dynamic> getDataShowNotif() async {
-    var box_showNotif = await Hive.openBox(nameBox!);
-    if (box_showNotif.isOpen) {
-      var addbox_showNotif = await Hive.box(nameBox!);
+    var boxShownotif = await Hive.openBox(nameBox!);
+    if (boxShownotif.isOpen) {
+      var addboxShownotif = Hive.box(nameBox!);
 
       bool checkData = false;
-      if (box_showNotif.isNotEmpty) {
+      if (boxShownotif.isNotEmpty) {
         var data = List.from(
-            (await box_showNotif.get("showNotif").toSet().toList())
+            (await boxShownotif.get("showNotif").toSet().toList())
                 .toSet()
                 .toList());
         // print(data);
@@ -405,28 +391,26 @@ class boxData {
   }
 
   Future<void> deleteDataShowNotif(String taskid) async {
-    var box_showNotif = await Hive.openBox(nameBox!);
-    if (box_showNotif.isOpen) {
-      var addbox_showNotif = await Hive.box(nameBox!);
+    var boxShownotif = await Hive.openBox(nameBox!);
+    if (boxShownotif.isOpen) {
+      var addboxShownotif = Hive.box(nameBox!);
 
       bool checkData = false;
-      if (box_showNotif.isNotEmpty) {
-        var data = List.from(box_showNotif.get("showNotif"));
-        if (data != null) {
-          for (var val in data) {
-            if (val['taskid'] == taskid) {
-              checkData = false;
-              data.remove(val);
-              print("Delete show notif successed");
-              break;
-            } else {
-              checkData = true;
-            }
+      if (boxShownotif.isNotEmpty) {
+        var data = List.from(boxShownotif.get("showNotif"));
+        for (var val in data) {
+          if (val['taskid'] == taskid) {
+            checkData = false;
+            data.remove(val);
+            print("Delete show notif successed");
+            break;
+          } else {
+            checkData = true;
           }
-          if (!checkData) {
-            addbox_showNotif.delete("showNotif");
-            addbox_showNotif.put("showNotif", data.toSet().toList());
-          }
+        }
+        if (!checkData) {
+          addboxShownotif.delete("showNotif");
+          addboxShownotif.put("showNotif", data.toSet().toList());
         }
       }
     }
@@ -438,19 +422,19 @@ class boxData {
       String? taskid,
       bool handoff = false}) async {
     await Hive.openBox(nameBox!);
-    var box_OpenValueWorksheet = await Hive.openBox(nameBox!);
+    var boxOpenvalueworksheet = await Hive.openBox(nameBox!);
     Map<String, dynamic> valueServertoDB = {"taskid": taskid};
     bool checkdata = false;
-    if (box_OpenValueWorksheet.isOpen) {
+    if (boxOpenvalueworksheet.isOpen) {
       print('data value worksheet in boxData class');
-      var box_AddValueWorksheet = Hive.box(nameBox!);
+      var boxAddvalueworksheet = Hive.box(nameBox!);
 
-      if (box_OpenValueWorksheet.isNotEmpty) {
-        List data = List.from(box_OpenValueWorksheet.get(userid) ?? []);
-        await box_OpenValueWorksheet.compact();
+      if (boxOpenvalueworksheet.isNotEmpty) {
+        List data = List.from(boxOpenvalueworksheet.get(userid) ?? []);
+        await boxOpenvalueworksheet.compact();
         // print(data);
 
-        if (data != null && data.isNotEmpty) {
+        if (data.isNotEmpty) {
           for (var value in data) {
             if (value['taskid'] == taskid) {
               checkdata = true;
@@ -465,33 +449,33 @@ class boxData {
           if (!checkdata) {
             valueServertoDB['data'] = valServer;
             data.add(valueServertoDB);
-            box_AddValueWorksheet.delete(userid);
+            boxAddvalueworksheet.delete(userid);
 
-            box_AddValueWorksheet.put(userid, data);
+            boxAddvalueworksheet.put(userid, data);
           } else {
             if (handoff) {
               valueServertoDB['data'] = valServer;
               data.add(valueServertoDB);
-              box_AddValueWorksheet.delete(userid);
+              boxAddvalueworksheet.delete(userid);
 
-              box_AddValueWorksheet.put(userid, data);
+              boxAddvalueworksheet.put(userid, data);
             }
           }
         } else {
           //isi box
 
           valueServertoDB['data'] = valServer;
-          box_AddValueWorksheet.put(userid, [valueServertoDB]);
+          boxAddvalueworksheet.put(userid, [valueServertoDB]);
         }
         // box_AddValueWorksheet.compact();
-        await box_OpenValueWorksheet.compact();
+        await boxOpenvalueworksheet.compact();
       } else {
         //isi box
 
         valueServertoDB['data'] = valServer;
-        box_AddValueWorksheet.put(userid, [valueServertoDB]);
+        boxAddvalueworksheet.put(userid, [valueServertoDB]);
         // box_AddValueWorksheet.compact();
-        await box_OpenValueWorksheet.compact();
+        await boxOpenvalueworksheet.compact();
       }
       // box_AddValueWorksheet.close();
     }
@@ -501,14 +485,14 @@ class boxData {
     final boxdata = boxData(nameBox: "box_setLoginCredential");
 
     String userId = await boxdata.getLoginCredential(param: "userId");
-    var box_OpenValueWorksheet = await Hive.openBox(nameBox!);
+    var boxOpenvalueworksheet = await Hive.openBox(nameBox!);
 
-    if (box_OpenValueWorksheet.isOpen) {
-      var box_AddValueWorksheet = Hive.box(nameBox!);
+    if (boxOpenvalueworksheet.isOpen) {
+      var boxAddvalueworksheet = Hive.box(nameBox!);
 
-      if (box_OpenValueWorksheet.isNotEmpty) {
-        var data = List.from(box_OpenValueWorksheet.get(userId));
-        await box_OpenValueWorksheet.compact();
+      if (boxOpenvalueworksheet.isNotEmpty) {
+        var data = List.from(boxOpenvalueworksheet.get(userId));
+        await boxOpenvalueworksheet.compact();
         // print(value);
 
         // valueServertoDB['data'] = valServer;
@@ -519,40 +503,36 @@ class boxData {
             break;
           }
         }
-        box_AddValueWorksheet.delete(userId);
-        box_AddValueWorksheet.put(userId, data);
+        boxAddvalueworksheet.delete(userId);
+        boxAddvalueworksheet.put(userId, data);
       } else {
         //isi box
       }
     }
-    await box_OpenValueWorksheet.compact();
+    await boxOpenvalueworksheet.compact();
   }
 
   Future<dynamic> getValueWorksheet({String? userid, String? taskid}) async {
     // await Hive.openBox("box_valworksheet");
 
-    var box_OpenValueWorksheet = await Hive.openBox("box_valworksheet");
+    var boxOpenvalueworksheet = await Hive.openBox("box_valworksheet");
     var valueServertoDB = {"taskid": taskid};
     bool checkdata = false;
-    if (box_OpenValueWorksheet.isOpen) {
-      var box_AddValueWorksheet = Hive.box("box_valworksheet");
+    if (boxOpenvalueworksheet.isOpen) {
+      var boxAddvalueworksheet = Hive.box("box_valworksheet");
 
-      if (box_OpenValueWorksheet.isNotEmpty) {
-        final data = List.from(await box_OpenValueWorksheet.get(userid) ?? []);
+      if (boxOpenvalueworksheet.isNotEmpty) {
+        final data = List.from(await boxOpenvalueworksheet.get(userid) ?? []);
 
-        await box_OpenValueWorksheet.compact();
+        await boxOpenvalueworksheet.compact();
 
-        if (data != null) {
-          for (var value in data) {
-            if (value['taskid'] == taskid) {
-              objLoadData = Map<String, dynamic>.from(value['data']);
-              break;
-            } else {
-              objLoadData = null;
-            }
+        for (var value in data) {
+          if (value['taskid'] == taskid) {
+            objLoadData = Map<String, dynamic>.from(value['data']);
+            break;
+          } else {
+            objLoadData = null;
           }
-        } else {
-          objLoadData = null;
         }
       } else {
         //isi box
@@ -567,18 +547,18 @@ class boxData {
     final boxdata = boxData(nameBox: "box_setLoginCredential");
     await Hive.openBox(nameBox!);
     String userId = await boxdata.getLoginCredential(param: "userId");
-    final box_OpenListMessage = await Hive.openBox(nameBox!);
-    if (box_OpenListMessage.isOpen) {
-      final box_AddMessage = Hive.box(nameBox!);
+    final boxOpenlistmessage = await Hive.openBox(nameBox!);
+    if (boxOpenlistmessage.isOpen) {
+      final boxAddmessage = Hive.box(nameBox!);
 
-      if (box_OpenListMessage.isOpen) {
-        if (box_OpenListMessage.isNotEmpty) {
-          box_AddMessage.delete(userId);
-          box_AddMessage.put(userId, dataGet);
+      if (boxOpenlistmessage.isOpen) {
+        if (boxOpenlistmessage.isNotEmpty) {
+          boxAddmessage.delete(userId);
+          boxAddmessage.put(userId, dataGet);
           return true;
         }
       }
-      await box_OpenListMessage.compact();
+      await boxOpenlistmessage.compact();
     }
     return false;
   }
@@ -589,14 +569,14 @@ class boxData {
     String userId = await boxdata.getLoginCredential(param: "userId");
 
     await Hive.openBox("box_listMessages");
-    final box_OpenListMessage = await Hive.openBox("box_listMessages");
+    final boxOpenlistmessage = await Hive.openBox("box_listMessages");
 
-    if (box_OpenListMessage.isOpen) {
-      final box_AddMessage = Hive.box("box_listMessages");
+    if (boxOpenlistmessage.isOpen) {
+      final boxAddmessage = Hive.box("box_listMessages");
 
-      if (box_OpenListMessage.isNotEmpty) {
-        var dataGet = List.from(box_OpenListMessage.get(userId) ?? []);
-        if (dataGet != null && dataGet.length != 0) {
+      if (boxOpenlistmessage.isNotEmpty) {
+        var dataGet = List.from(boxOpenlistmessage.get(userId) ?? []);
+        if (dataGet.isNotEmpty) {
           for (var value in dataGet) {
             if (value['idmessage'] == idmessage &&
                 value['messageOpen'] == false) {
@@ -607,8 +587,8 @@ class boxData {
               break;
             }
           }
-          box_AddMessage.delete(userId);
-          box_AddMessage.put(userId, dataGet);
+          boxAddmessage.delete(userId);
+          boxAddmessage.put(userId, dataGet);
         } else {
           print('dataGet is null and the length is 0');
         }
@@ -616,7 +596,7 @@ class boxData {
         print('box is empty');
       }
       //08082020
-      await box_OpenListMessage.compact();
+      await boxOpenlistmessage.compact();
     }
   }
 
@@ -632,9 +612,9 @@ class boxData {
       }
     }
     await Hive.openBox("box_listMessages");
-    final box_OpenListMessage = await Hive.openBox("box_listMessages");
-    if (box_OpenListMessage.isOpen) {
-      final box_AddMessage = Hive.box("box_listMessages");
+    final boxOpenlistmessage = await Hive.openBox("box_listMessages");
+    if (boxOpenlistmessage.isOpen) {
+      final boxAddmessage = Hive.box("box_listMessages");
       final boxdata = boxData(nameBox: "box_setLoginCredential");
 
       String userId = await boxdata.getLoginCredential(param: "userId");
@@ -642,9 +622,9 @@ class boxData {
       DateTime timeMessage = DateTime.now();
 
       Map<String, dynamic> dataSave = {"taskid": data['id']};
-      if (box_OpenListMessage.isNotEmpty) {
-        var dataGet = List.from(box_OpenListMessage.get(userId) ?? []);
-        if (dataGet != null && dataGet.length != 0) {
+      if (boxOpenlistmessage.isNotEmpty) {
+        var dataGet = List.from(boxOpenlistmessage.get(userId) ?? []);
+        if (dataGet.isNotEmpty) {
           dataSave['idmessage'] = dataGet.length + 1;
           dataSave['title'] = title;
           dataSave['body'] = body;
@@ -658,8 +638,8 @@ class boxData {
           print("dataSave1");
           print(dataSave);
           dataGet.insert(0, dataSave);
-          box_AddMessage.delete(userId);
-          box_AddMessage.put(userId, dataGet);
+          boxAddmessage.delete(userId);
+          boxAddmessage.put(userId, dataGet);
           await Hive.openBox("box_listMessages");
         } else {
           dataSave['idmessage'] = 1;
@@ -674,7 +654,7 @@ class boxData {
           }
           print("dataSave2");
           print(dataSave);
-          box_AddMessage.put(userId, [dataSave]);
+          boxAddmessage.put(userId, [dataSave]);
           await Hive.openBox("box_listMessages");
         }
       } else {
@@ -690,10 +670,10 @@ class boxData {
         }
         print("dataSave3");
         print(dataSave);
-        box_AddMessage.put(userId, [dataSave]);
+        boxAddmessage.put(userId, [dataSave]);
         await Hive.openBox("box_listMessages");
       }
-      await box_OpenListMessage.compact();
+      await boxOpenlistmessage.compact();
     }
 
     if (background) {
@@ -706,16 +686,16 @@ class boxData {
   }
 
   addTimeSheet({String? userid, String? taskid, List<String?>? values}) async {
-    final box_openListTimesheet = await Hive.openBox(nameBox!);
+    final boxOpenlisttimesheet = await Hive.openBox(nameBox!);
     bool availData = false;
     Map<String, dynamic> valueToDB = {"taskid": taskid};
-    if (box_openListTimesheet.isOpen) {
-      final box_AddtimeSheet = Hive.box(nameBox!);
+    if (boxOpenlisttimesheet.isOpen) {
+      final boxAddtimesheet = Hive.box(nameBox!);
 
-      if (box_openListTimesheet.isNotEmpty) {
+      if (boxOpenlisttimesheet.isNotEmpty) {
         // print(box_openListTimesheet.values);
         var dataListTimesheet =
-            List.from(box_openListTimesheet.get(userid) ?? []);
+            List.from(boxOpenlisttimesheet.get(userid) ?? []);
 
         if (dataListTimesheet.isNotEmpty) {
           for (var value in dataListTimesheet) {
@@ -738,23 +718,23 @@ class boxData {
             print("kseini1");
             valueToDB['data'] = [values];
             dataListTimesheet.add(valueToDB);
-            box_AddtimeSheet.delete(userid);
-            box_AddtimeSheet.put(userid, dataListTimesheet);
+            boxAddtimesheet.delete(userid);
+            boxAddtimesheet.put(userid, dataListTimesheet);
           } else {
             print("kseini2");
-            box_AddtimeSheet.put(userid, dataListTimesheet);
+            boxAddtimesheet.put(userid, dataListTimesheet);
           }
         } else {
           print("kseini3");
           valueToDB['data'] = [values];
-          box_AddtimeSheet.put(userid, [valueToDB]);
+          boxAddtimesheet.put(userid, [valueToDB]);
         }
       } else {
         print("kseini4");
         valueToDB['data'] = [values];
-        box_AddtimeSheet.put(userid, [valueToDB]);
+        boxAddtimesheet.put(userid, [valueToDB]);
       }
-      await box_openListTimesheet.compact();
+      await boxOpenlisttimesheet.compact();
     }
     return true;
   }
@@ -768,22 +748,17 @@ class boxData {
     Map<String, dynamic> valueToDB = {"taskid": taskid};
     dynamic valueBox = {};
     if (openCommonSetting.isOpen) {
-      final box_AddcommonSetting = Hive.box(nameBox!);
+      final boxAddcommonsetting = Hive.box(nameBox!);
 
       if (openCommonSetting.isNotEmpty) {
         var dataSetting = List.from(openCommonSetting.get(userid) ?? []);
-        if (dataSetting != null) {
-          valueToDB['data'] = values;
-          dataSetting.add(valueToDB);
-          box_AddcommonSetting.delete(userid);
-          box_AddcommonSetting.put(userid, dataSetting);
-        } else {
-          valueToDB['data'] = values;
-          box_AddcommonSetting.put(userid, [valueToDB]);
-        }
+        valueToDB['data'] = values;
+        dataSetting.add(valueToDB);
+        boxAddcommonsetting.delete(userid);
+        boxAddcommonsetting.put(userid, dataSetting);
       } else {
         valueToDB['data'] = values;
-        box_AddcommonSetting.put(userid, [valueToDB]);
+        boxAddcommonsetting.put(userid, [valueToDB]);
       }
       await openCommonSetting.compact();
     }
@@ -796,7 +771,7 @@ class boxData {
     Map<String, dynamic> valueToDB = {"taskid": taskid};
     dynamic valueBox = {};
     if (openCommonSetting.isOpen) {
-      final box_AddcommonSetting = Hive.box(nameBox!);
+      final boxAddcommonsetting = Hive.box(nameBox!);
 
       if (openCommonSetting.isNotEmpty) {
         var dataSetting = List.from(openCommonSetting.get(userid) ?? []);
@@ -843,12 +818,12 @@ class boxData {
         //   dataSetting.add(valueToDB);
         //   box_AddcommonSetting.put(userid, dataSetting);
         // } else {
-        box_AddcommonSetting.delete(userid);
-        box_AddcommonSetting.put(userid, dataSetting);
+        boxAddcommonsetting.delete(userid);
+        boxAddcommonsetting.put(userid, dataSetting);
         // }
       } else {
         valueToDB['data'] = values;
-        box_AddcommonSetting.put(userid, [valueToDB]);
+        boxAddcommonsetting.put(userid, [valueToDB]);
       }
       await openCommonSetting.compact();
     }
@@ -860,23 +835,19 @@ class boxData {
     Map<String, dynamic> valueToDB = {"taskid": taskid};
     dynamic valueBox = {"result": ""};
     if (openCommonSetting.isOpen) {
-      final box_AddcommonSetting = Hive.box(nameBox!);
+      final boxAddcommonsetting = Hive.box(nameBox!);
 
       if (openCommonSetting.isNotEmpty) {
         List dataSetting = List.from(openCommonSetting.get(userid) ?? []);
         //08082022
         // box_AddcommonSetting.close();
-        if (dataSetting != null) {
-          for (var val in dataSetting) {
-            if (val['taskid'] == taskid) {
-              return val['data'];
-              chekcData = false;
-              // box_AddcommonSetting.put(userid, val);
-              break;
-            }
+        for (var val in dataSetting) {
+          if (val['taskid'] == taskid) {
+            return val['data'];
+            chekcData = false;
+            // box_AddcommonSetting.put(userid, val);
+            break;
           }
-        } else {
-          return null;
         }
       }
     }
@@ -889,18 +860,18 @@ class boxData {
       String? statusTask,
       Map<String, dynamic>? values}) async {
     // var updateDasboard = boxData(nameBox: 'box_dashboard');
-    final box_OpenListTask = await Hive.openBox(nameBox!);
+    final boxOpenlisttask = await Hive.openBox(nameBox!);
     List dataList = [];
     Map<String, dynamic> dataSave = {};
 
     bool checkData = false;
 
-    if (box_OpenListTask.isOpen) {
-      dataList = List.from(box_OpenListTask.get(userid) ?? []);
+    if (boxOpenlisttask.isOpen) {
+      dataList = List.from(boxOpenlisttask.get(userid) ?? []);
 
-      final box_AddListTask = Hive.box(nameBox!);
+      final boxAddlisttask = Hive.box(nameBox!);
 
-      if (dataList != null && dataList.isNotEmpty) {
+      if (dataList.isNotEmpty) {
         for (var value in dataList) {
           if (values!['id'] == value['data']['id']) {
             value['data'] = values;
@@ -921,13 +892,13 @@ class boxData {
           dataSave['StatusTask'] = statusTask;
 
           dataList.insert(0, dataSave);
-          box_AddListTask.delete(userid);
-          box_AddListTask.put(userid, dataList);
+          boxAddlisttask.delete(userid);
+          boxAddlisttask.put(userid, dataList);
           // updateDasboard.addDataDashboard(
           //     param: 'getPekerjaan', tambah: true, reset: false);
         } else {
-          box_AddListTask.delete(userid);
-          box_AddListTask.put(userid, dataList);
+          boxAddlisttask.delete(userid);
+          boxAddlisttask.put(userid, dataList);
         }
       } else {
         checkData = false;
@@ -936,22 +907,22 @@ class boxData {
         dataList.insert(0, dataSave);
       }
 
-      await box_OpenListTask.compact();
+      await boxOpenlisttask.compact();
     }
   }
 
   Future<void> deleteTask(
       {String? userid, int? taskid, String? from = ""}) async {
     var updateDasboard = boxData(nameBox: 'box_dashboard');
-    final box_OpenListTask = await Hive.openBox(nameBox!);
+    final boxOpenlisttask = await Hive.openBox(nameBox!);
     List dataList = [];
 
-    if (box_OpenListTask.isOpen) {
-      dataList = List.from(box_OpenListTask.get(userid) ?? []);
+    if (boxOpenlisttask.isOpen) {
+      dataList = List.from(boxOpenlisttask.get(userid) ?? []);
 
-      final box_AddListTask = Hive.box(nameBox!);
+      final boxAddlisttask = Hive.box(nameBox!);
 
-      if (dataList != null && dataList.isNotEmpty) {
+      if (dataList.isNotEmpty) {
         for (var value in dataList) {
           // print("value datalist");
           // print(value);
@@ -988,10 +959,10 @@ class boxData {
         }
       }
 
-      box_AddListTask.delete(userid);
-      box_AddListTask.put(userid, dataList);
+      boxAddlisttask.delete(userid);
+      boxAddlisttask.put(userid, dataList);
 
-      await box_OpenListTask.compact();
+      await boxOpenlisttask.compact();
     }
   }
 
@@ -1041,43 +1012,31 @@ class boxData {
     }
     final getUserid = boxData(nameBox: "box_setLoginCredential");
     String userid = await getUserid.getLoginCredential(param: "userId");
-    final box_OpenListTask = await Hive.openBox(nameBox!);
+    final boxOpenlisttask = await Hive.openBox(nameBox!);
     Map<String, dynamic> dataAdd = {};
-    if (box_OpenListTask.isOpen) {
-      final box_AddTask = Hive.box(nameBox!);
+    if (boxOpenlisttask.isOpen) {
+      final boxAddtask = Hive.box(nameBox!);
 
-      if (box_OpenListTask.isNotEmpty) {
-        var data = List.from(box_OpenListTask.get(userid) ?? []);
-        if (data != null) {
-          dataAdd['data'] = dataTask;
-          dataAdd['StatusTask'] = "OnGoing";
-          data.insert(0, dataAdd);
-          box_AddTask.delete(userid);
-          box_AddTask.put(userid, data);
-          await getDetail(dataTask['id']);
-          await getFormWorksheet(dataTask['id']);
-          await getValueWork(dataTask['id'], int.parse(userid), false);
-        } else {
-          dataAdd['data'] = dataTask;
-          dataAdd['StatusTask'] = "OnGoing";
-          box_AddTask.delete(userid);
-          data.insert(0, dataAdd);
-          box_AddTask.put(userid, data);
-          await getDetail(dataTask['id']);
-          await getFormWorksheet(dataTask['id']);
-
-          await getValueWork(dataTask['id'], int.parse(userid), false);
-        }
+      if (boxOpenlisttask.isNotEmpty) {
+        var data = List.from(boxOpenlisttask.get(userid) ?? []);
+        dataAdd['data'] = dataTask;
+        dataAdd['StatusTask'] = "OnGoing";
+        data.insert(0, dataAdd);
+        boxAddtask.delete(userid);
+        boxAddtask.put(userid, data);
+        await getDetail(dataTask['id']);
+        await getFormWorksheet(dataTask['id']);
+        await getValueWork(dataTask['id'], int.parse(userid), false);
       } else {
         dataAdd['data'] = dataTask;
         dataAdd['StatusTask'] = "OnGoing";
 
-        box_AddTask.put(userid, [dataAdd]);
+        boxAddtask.put(userid, [dataAdd]);
         await getDetail(dataTask['id']);
         await getFormWorksheet(dataTask['id']);
         await getValueWork(dataTask['id'], int.parse(userid), false);
       }
-      await box_OpenListTask.compact();
+      await boxOpenlisttask.compact();
     }
   }
 
@@ -1087,14 +1046,14 @@ class boxData {
       String? statusTask,
       List? values}) async {
     var updateDasboard = boxData(nameBox: 'box_dashboard');
-    final box_OpenListTask = await Hive.openBox(nameBox!);
+    final boxOpenlisttask = await Hive.openBox(nameBox!);
 
     List dataSave = [];
     List dataHistory = [];
     bool checkData = false;
 
-    if (box_OpenListTask.isOpen) {
-      final box_AddListTask = Hive.box(nameBox!);
+    if (boxOpenlisttask.isOpen) {
+      final boxAddlisttask = Hive.box(nameBox!);
 
       for (var data in values!) {
         Map<String, dynamic> dataAdd = {};
@@ -1109,9 +1068,9 @@ class boxData {
         // updateDasboard.addDataDashboard(
         //     param: 'getPekerjaan', tambah: true, reset: false);
       }
-      box_AddListTask.delete(userid);
-      box_AddListTask.put(userid, dataSave);
-      await box_OpenListTask.compact();
+      boxAddlisttask.delete(userid);
+      boxAddlisttask.put(userid, dataSave);
+      await boxOpenlisttask.compact();
     }
     return true;
   }
@@ -1121,7 +1080,7 @@ class boxData {
       String? taskid,
       String? statusTask,
       List? values}) async {
-    final box_OpenHistoryTask = await Hive.openBox(nameBox!);
+    final boxOpenhistorytask = await Hive.openBox(nameBox!);
     var updateDasboard = boxData(nameBox: 'box_dashboard');
     updateDasboard.addDataDashboard(
         param: 'taskDikirim', tambah: false, reset: true);
@@ -1131,8 +1090,8 @@ class boxData {
     bool checkData = false;
     print("values history");
     print(values);
-    if (box_OpenHistoryTask.isOpen) {
-      final box_AddHistoryTask = Hive.box(nameBox!);
+    if (boxOpenhistorytask.isOpen) {
+      final boxAddhistorytask = Hive.box(nameBox!);
 
       for (var data in values!) {
         idTaskHistory.add(data['id'].toString());
@@ -1151,8 +1110,8 @@ class boxData {
         // print(idTaskHistory.length);
       }
       //delete value from task
-      var box_OpenListPekerjaan = Hive.box("box_listPekerjaan");
-      var viewData = List.from(box_OpenListPekerjaan.get(userid) ?? []);
+      var boxOpenlistpekerjaan = Hive.box("box_listPekerjaan");
+      var viewData = List.from(boxOpenlistpekerjaan.get(userid) ?? []);
       for (var value in viewData) {
         // print(value);
         idTaskHistory.add(value['data']['id'].toString());
@@ -1161,9 +1120,9 @@ class boxData {
       deleteFormWorksheet(idTaskHistory);
       deleteValueWorksheet(idTaskHistory, userid);
       //close tag
-      box_AddHistoryTask.delete(userid);
-      box_AddHistoryTask.put(userid, dataSave);
-      await box_OpenHistoryTask.compact();
+      boxAddhistorytask.delete(userid);
+      boxAddhistorytask.put(userid, dataSave);
+      await boxOpenhistorytask.compact();
     }
 
     return true;
@@ -1172,27 +1131,27 @@ class boxData {
   Future<void> markedPage({String? namePage}) async {
     print("namePage");
     print(namePage);
-    final box_OpenMarkedPage = await Hive.openBox(nameBox!);
-    if (box_OpenMarkedPage.isOpen) {
-      final box_AddMarkedPage = Hive.box(nameBox!);
-      if (box_AddMarkedPage.isNotEmpty) {
-        box_AddMarkedPage.delete('markedPage');
+    final boxOpenmarkedpage = await Hive.openBox(nameBox!);
+    if (boxOpenmarkedpage.isOpen) {
+      final boxAddmarkedpage = Hive.box(nameBox!);
+      if (boxAddmarkedpage.isNotEmpty) {
+        boxAddmarkedpage.delete('markedPage');
       }
-      box_AddMarkedPage.put("markedPage", namePage);
-      await box_OpenMarkedPage.compact();
+      boxAddmarkedpage.put("markedPage", namePage);
+      await boxOpenmarkedpage.compact();
     }
   }
 
   Future<String> getMarkedPage() async {
     var namePage = "";
-    final box_OpenMarkedPage = await Hive.openBox(nameBox!);
-    if (box_OpenMarkedPage.isOpen) {
-      final box_AddMarkedPage = Hive.box(nameBox!);
+    final boxOpenmarkedpage = await Hive.openBox(nameBox!);
+    if (boxOpenmarkedpage.isOpen) {
+      final boxAddmarkedpage = Hive.box(nameBox!);
 
-      if (box_OpenMarkedPage.isNotEmpty) {
-        namePage = box_OpenMarkedPage.get("markedPage");
+      if (boxOpenmarkedpage.isNotEmpty) {
+        namePage = boxOpenmarkedpage.get("markedPage");
       }
-      await box_OpenMarkedPage.compact();
+      await boxOpenmarkedpage.compact();
     }
     return namePage;
   }
@@ -1210,15 +1169,15 @@ class boxData {
         var result = objNetwork.Data;
         // print("result dari getdetail");
         // print(result);
-        var box_DetailList = await Hive.openBox("box_detailPekerjaan");
-        final data = box_DetailList.get(taskid.toString());
+        var boxDetaillist = await Hive.openBox("box_detailPekerjaan");
+        final data = boxDetaillist.get(taskid.toString());
 
-        if (box_DetailList.isOpen) {
-          var box_AddDetail = Hive.box("box_detailPekerjaan");
+        if (boxDetaillist.isOpen) {
+          var boxAdddetail = Hive.box("box_detailPekerjaan");
 
-          if (box_DetailList.isNotEmpty) {
+          if (boxDetaillist.isNotEmpty) {
             if (data == null) {
-              box_AddDetail.put(taskid.toString(), result);
+              boxAdddetail.put(taskid.toString(), result);
               // return result;
             } else {
               // use data
@@ -1228,13 +1187,13 @@ class boxData {
                   data[i] = result[i];
                 }
               });
-              box_AddDetail.delete(taskid.toString());
-              box_AddDetail.put(taskid.toString(), data);
+              boxAdddetail.delete(taskid.toString());
+              boxAdddetail.put(taskid.toString(), data);
             }
           } else {
-            box_AddDetail.put(taskid.toString(), result);
+            boxAdddetail.put(taskid.toString(), result);
           }
-          await box_DetailList.compact();
+          await boxDetaillist.compact();
         }
         // box_AddList.clear();
         // box_AddDetail.clear();
@@ -1247,12 +1206,12 @@ class boxData {
   deleteFormWorksheet(List idWorksheet) async {
     var WorksheetForm = await Hive.openBox("box_worksheetform");
     if (WorksheetForm.isOpen) {
-      var box_AddWorksheetForm = Hive.box("box_worksheetform");
+      var boxAddworksheetform = Hive.box("box_worksheetform");
 // WorksheetForm.containsKey(key)
       if (WorksheetForm.isNotEmpty) {
         for (var val in WorksheetForm.keys) {
           if (!idWorksheet.contains(val)) {
-            box_AddWorksheetForm.delete(val);
+            boxAddworksheetform.delete(val);
             print("delete formworksheet success");
           }
         }
@@ -1263,12 +1222,12 @@ class boxData {
   deleteTaskDetail(List idWorksheet) async {
     var WorksheetForm = await Hive.openBox("box_detailPekerjaan");
     if (WorksheetForm.isOpen) {
-      var box_AddWorksheetForm = Hive.box("box_detailPekerjaan");
+      var boxAddworksheetform = Hive.box("box_detailPekerjaan");
 // WorksheetForm.containsKey(key)
       if (WorksheetForm.isNotEmpty) {
         for (var val in WorksheetForm.keys) {
           if (!idWorksheet.contains(val)) {
-            box_AddWorksheetForm.delete(val);
+            boxAddworksheetform.delete(val);
             // box_AddWorksheetForm.delete("9071");
             print("delete detailTask success");
           }
@@ -1280,7 +1239,7 @@ class boxData {
   deleteValueWorksheet(List idWorksheet, String? userid) async {
     var WorksheetValue = await Hive.openBox("box_valworksheet");
     if (WorksheetValue.isOpen) {
-      var box_AddWorksheetValue = Hive.box("box_valworksheet");
+      var boxAddworksheetvalue = Hive.box("box_valworksheet");
 // WorksheetForm.containsKey(key)
       if (WorksheetValue.isNotEmpty) {
         var dataDelete = [];
@@ -1305,20 +1264,20 @@ class boxData {
         dataDelete = [];
         WorksheetValue.delete(userid);
 
-        box_AddWorksheetValue.put(userid, data);
+        boxAddworksheetvalue.put(userid, data);
         print("delete value has true success");
       }
     }
   }
 
   deleteNotif({String? taskid, String? userid}) async {
-    final box_OpenListMessage = await Hive.openBox("box_listMessages");
+    final boxOpenlistmessage = await Hive.openBox("box_listMessages");
 
-    if (box_OpenListMessage.isOpen) {
-      final box_AddMessage = Hive.box("box_listMessages");
+    if (boxOpenlistmessage.isOpen) {
+      final boxAddmessage = Hive.box("box_listMessages");
 
-      if (box_OpenListMessage.isNotEmpty) {
-        var dataLocal = List.from(box_OpenListMessage.get(userid) ?? []);
+      if (boxOpenlistmessage.isNotEmpty) {
+        var dataLocal = List.from(boxOpenlistmessage.get(userid) ?? []);
 
         print("dataLocal");
         print(dataLocal);
@@ -1336,8 +1295,8 @@ class boxData {
             }
           }
           // dataLocal.removeWhere((element) => remove.contains(element));
-          box_AddMessage.delete(userid);
-          box_AddMessage.put(userid, dataLocal);
+          boxAddmessage.delete(userid);
+          boxAddmessage.put(userid, dataLocal);
         } else {
           print("notif box from userid is empty");
         }
@@ -1355,7 +1314,7 @@ class boxData {
     Network cekKoneksi = await objCekConnection.CheckConnection();
     var WorksheetForm = await Hive.openBox("box_worksheetform");
     if (WorksheetForm.isOpen) {
-      var box_AddWorksheetForm = Hive.box("box_worksheetform");
+      var boxAddworksheetform = Hive.box("box_worksheetform");
 
       if (WorksheetForm.isNotEmpty) {
         var data = WorksheetForm.get(taskid.toString());
@@ -1367,7 +1326,7 @@ class boxData {
             if (!objNetwork.Status) {
               print("gadapet ni worksheet form nya");
             } else {
-              box_AddWorksheetForm.put(taskid.toString(), objNetwork.Data);
+              boxAddworksheetform.put(taskid.toString(), objNetwork.Data);
               return true;
             }
           }
@@ -1381,7 +1340,7 @@ class boxData {
           if (!objNetwork.Status) {
             print("gadapet ni worksheet form nya");
           } else {
-            box_AddWorksheetForm.put(taskid.toString(), objNetwork.Data);
+            boxAddworksheetform.put(taskid.toString(), objNetwork.Data);
             return true;
           }
         }
@@ -1421,15 +1380,15 @@ class boxData {
     String? taskid,
     String? statusTask,
   }) async {
-    final box_OpenListTask = await Hive.openBox(nameBox!);
+    final boxOpenlisttask = await Hive.openBox(nameBox!);
     List dataList = [];
 
-    if (box_OpenListTask.isOpen) {
-      final box_AddListTask = Hive.box(nameBox!);
+    if (boxOpenlisttask.isOpen) {
+      final boxAddlisttask = Hive.box(nameBox!);
 
-      dataList = List.from(box_OpenListTask.get(userid));
+      dataList = List.from(boxOpenlisttask.get(userid));
 
-      if (dataList.length != 0) {
+      if (dataList.isNotEmpty) {
         for (var value in dataList) {
           if (value['data']['id'].toString() == taskid) {
             value['StatusTask'] = statusTask;
@@ -1441,9 +1400,9 @@ class boxData {
           }
         }
       }
-      box_AddListTask.delete(userid);
-      box_AddListTask.put(userid, dataList);
-      await box_OpenListTask.compact();
+      boxAddlisttask.delete(userid);
+      boxAddlisttask.put(userid, dataList);
+      await boxOpenlisttask.compact();
     }
   }
 
@@ -1454,7 +1413,7 @@ class boxData {
 
     String userId = await boxdata.getLoginCredential(param: "userId");
     var listUploadWorksheet = await Hive.openBox("box_listUploadWorksheet");
-    var addUploadWorksheet = await Hive.box("box_listUploadWorksheet");
+    var addUploadWorksheet = Hive.box("box_listUploadWorksheet");
     bool checkData = false;
     if (listUploadWorksheet.isOpen) {
       List datalistUpload = List.from(listUploadWorksheet.get(userId) ?? []);
@@ -1463,7 +1422,7 @@ class boxData {
       print("datalistUpload from cekdataonlistupload");
       print(datalistUpload);
 
-      if (datalistUpload != null && datalistUpload.isNotEmpty) {
+      if (datalistUpload.isNotEmpty) {
         for (var value in datalistUpload) {
           if (value['taskid'] == taskID) {
             //delete this validation value['upload']
@@ -1490,7 +1449,7 @@ class boxData {
 
     String userId = await boxdata.getLoginCredential(param: "userId");
     var listUploadWorksheet = await Hive.openBox("box_listUploadWorksheet");
-    var addUploadWorksheet = await Hive.box("box_listUploadWorksheet");
+    var addUploadWorksheet = Hive.box("box_listUploadWorksheet");
     bool checkData = false;
     if (listUploadWorksheet.isOpen) {
       List datalistUpload = listUploadWorksheet.get(userId);
@@ -1499,7 +1458,7 @@ class boxData {
       print("datalistUpload from cekdataonlistupload");
       print(datalistUpload);
 
-      if (datalistUpload != null && datalistUpload.isNotEmpty) {
+      if (datalistUpload.isNotEmpty) {
         for (var value in datalistUpload) {
           if (value['taskid'] == taskID) {
             print("value was found");
@@ -1530,7 +1489,7 @@ class boxData {
       // addUploadWorksheet.close();
       print(datalistUpload);
 
-      if (datalistUpload != null && datalistUpload.isNotEmpty) {
+      if (datalistUpload.isNotEmpty) {
         return true;
       } else {
         return false;
@@ -1562,44 +1521,29 @@ class boxData {
       if (OpenlistUploadWorksheet.isNotEmpty) {
         var dataUploadList =
             List.from(OpenlistUploadWorksheet.get(userId) ?? []);
-        if (dataUploadList != null) {
-          Id = dataUploadList.length + 1;
-          print(userId);
-          print("taskId");
-          print(taskId);
-          print(status);
+        Id = dataUploadList.length + 1;
+        print(userId);
+        print("taskId");
+        print(taskId);
+        print(status);
 
-          print(timesheetDate);
-          print(timesheetDesc);
-          print(timesheetDuration);
-          print(open);
-          dataUploadList.add({
-            "id": Id,
-            "upload": 0,
-            "taskid": taskId,
-            "status": status,
-            "timesheet_date": timesheetDate,
-            "timesheet_description": timesheetDesc,
-            "timesheet_duration": timesheetDuration,
-            "open": open
-          });
-          print(dataUploadList.last);
-          AddlistUploadWorksheet.delete(userId);
-          AddlistUploadWorksheet.put(userId, dataUploadList);
-        } else {
-          AddlistUploadWorksheet.put(userId, [
-            {
-              "id": Id,
-              "upload": 0,
-              "taskid": taskId,
-              "status": status,
-              "timesheet_date": timesheetDate,
-              "timesheet_description": timesheetDesc,
-              "timesheet_duration": timesheetDuration,
-              "open": open
-            }
-          ]);
-        }
+        print(timesheetDate);
+        print(timesheetDesc);
+        print(timesheetDuration);
+        print(open);
+        dataUploadList.add({
+          "id": Id,
+          "upload": 0,
+          "taskid": taskId,
+          "status": status,
+          "timesheet_date": timesheetDate,
+          "timesheet_description": timesheetDesc,
+          "timesheet_duration": timesheetDuration,
+          "open": open
+        });
+        print(dataUploadList.last);
+        AddlistUploadWorksheet.delete(userId);
+        AddlistUploadWorksheet.put(userId, dataUploadList);
       } else {
         AddlistUploadWorksheet.put(userId, [
           {
@@ -1752,5 +1696,4 @@ class boxData {
   }
   ]
   */
-
 }

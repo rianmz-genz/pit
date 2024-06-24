@@ -1,12 +1,12 @@
 class Network {
   bool Status = false;
   String? Message = "";
-  dynamic? Data = null;
+  dynamic Data;
   String? Error = "";
 
   Network(
-      {required bool this.Status,
-      String? this.Message,
-      dynamic? this.Data,
+      {required this.Status,
+      this.Message,
+      this.Data,
       this.Error});
 }

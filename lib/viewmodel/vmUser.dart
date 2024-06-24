@@ -9,9 +9,7 @@ class vmUser {
       String? Picture,
       String? Kemampuan,
       String? Status}) async {
-    final DbHelper _helper = new DbHelper();
-    print("picture");
-    print(Picture);
+    final DbHelper _helper = DbHelper();
     User _User = User(
         id: 1,
         Name: Name,
@@ -25,7 +23,7 @@ class vmUser {
   }
 
   Future<User> getUserData() async {
-    final DbHelper _helper = new DbHelper();
+    final DbHelper _helper = DbHelper();
 
     User _User = User(id: 0, Picture: "");
 
@@ -33,11 +31,11 @@ class vmUser {
         tableName: UserQuery.TABLE_NAME,
         strWhere: "id = ?",
         whereArgs: [1]).then((value) {
-      value.forEach((element) {
+      for (var element in value) {
         // print('select user');
         // print(element);
         _User = User.fromJson(element);
-      });
+      }
     });
 
     String sql = "Select * From User ";

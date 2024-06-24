@@ -2,14 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import '../model/mNetwork.dart';
 import '../network/CheckDataConnection.dart';
 import '../network/worksheet.dart';
-import 'package:flutter/painting.dart';
 import '../utils/boxData.dart';
 
 class clsWorkshop {
@@ -29,12 +27,12 @@ class workSheetFormNotifier extends ChangeNotifier {
   dynamic Task;
   dynamic statusTask;
   bool? lastSavedUser = false;
-  dynamic dataFormPure = null;
+  dynamic dataFormPure;
   int tresholdPartDiganti = 5;
   int page = 1;
   Map<String, dynamic> dataArr = {};
-  dynamic objData = null;
-  dynamic objLoadData = null;
+  dynamic objData;
+  dynamic objLoadData;
   final boxdata = boxData(nameBox: "box_setLoginCredential");
 
   String userid = "";
@@ -47,6 +45,7 @@ class workSheetFormNotifier extends ChangeNotifier {
     print(Task);
 
     userid = await boxdata.getLoginCredential(param: "userId");
+    print("userid ${userid}");
     objData = await getAllData();
 
     notifyListeners();
@@ -70,13 +69,14 @@ class workSheetFormNotifier extends ChangeNotifier {
     Connection objCekConnection = Connection();
     Network cekKoneksi = await objCekConnection.CheckConnection();
     var WorksheetForm = await Hive.openBox("box_worksheetform");
-    var box_AddWorksheetForm = Hive.box("box_worksheetform");
+    var boxAddworksheetform = Hive.box("box_worksheetform");
 
     if (cekKoneksi.Status && statusTask == "Open") {
       //view di worksheet ketika di trigger dari ambil pekerjaan/pop up message/list messages
       //load from server
       // await _loadValueData(objWorksheetNetwork);
       int dataTaskId = 0;
+      print("initask ${Task}");
       if (Task["id"].runtimeType == String) {
         dataTaskId = int.parse(Task["id"]);
       }
@@ -91,21 +91,22 @@ class workSheetFormNotifier extends ChangeNotifier {
         await _getLoadDataFromServer(objWorksheetNetwork, int.parse(userid));
         dataFormPure = objNetwork.Data;
         objData = WorkSheetArrayData(objNetwork.Data);
+        print('objData ${objData}');
         return objData;
       }
     }
     // else {
     //TODO cek update terakhir
-    int int_taskid;
+    int intTaskid;
     if (Task["id"].runtimeType == String) {
-      int_taskid = int.parse(Task['id']);
+      intTaskid = int.parse(Task['id']);
     } else {
-      int_taskid = Task['id'];
+      intTaskid = Task['id'];
     }
     if (cekKoneksi.Status && statusTask == "OnGoing") {
       print('last saved executed');
       lastSavedUser = await objWorksheetNetwork.ceklastSaved(
-          userid: int.parse(userid), taskid: int_taskid);
+          userid: int.parse(userid), taskid: intTaskid);
     }
 
     //close tag
@@ -122,6 +123,8 @@ class workSheetFormNotifier extends ChangeNotifier {
       //
     }
     // }
+    print('objData ${objData}');
+    print('statusTask ${statusTask}');
 
     return objData;
   }
@@ -257,7 +260,7 @@ class workSheetFormNotifier extends ChangeNotifier {
     for (var i = 0; i < splitStr.length; i++) {
       // You do not need to check if i is larger than splitStr length, as your for does that for you
       // Assign it back to the array
-      if (splitStr[i].length != 0) {
+      if (splitStr[i].isNotEmpty) {
         splitStr[i] = splitStr[i][0].toUpperCase() + splitStr[i].substring(1);
       }
     }
@@ -272,9 +275,9 @@ class workSheetFormNotifier extends ChangeNotifier {
       if (entitlement is List<dynamic>) {
         // print("list worksheet array");
         List<clsWorkshop> tmpWidget = WorkSheetArrayData(entitlement);
-        tmpWidget.forEach((objData) {
+        for (var objData in tmpWidget) {
           lstClsWorkshop.add(objData);
-        });
+        }
       } else if (entitlement.containsKey("child") &&
           entitlement['child'].length != 0) {
         clsWorkshop objClsWorkshop = clsWorkshop();
@@ -315,9 +318,9 @@ class workSheetFormNotifier extends ChangeNotifier {
         if (entitlement['child'] is List<dynamic>) {
           List<clsWorkshop> tmpWidget =
               WorkSheetArrayData(entitlement['child']);
-          tmpWidget.forEach((objData) {
+          for (var objData in tmpWidget) {
             lstClsWorkshop.add(objData);
-          });
+          }
         }
       } else {
         clsWorkshop objClsWorkshop = clsWorkshop();
@@ -690,7 +693,7 @@ class workSheetFormNotifier extends ChangeNotifier {
     // print(nameField);
     final tanggal = DateFormat('dd').format(DateTime.now());
     String dir = (await getApplicationDocumentsDirectory()).path;
-    File file = new File("$dir/" + userid + taskid + nameField + ".png");
+    File file = File("$dir/" + userid + taskid + nameField + ".png");
     // File file = File("$dir/" + userid + taskid + nameField + tanggal + ".png");
     if (!file.existsSync()) {
       // print("file gambar tidak ada,maka file dapat dibuat");
@@ -698,7 +701,7 @@ class workSheetFormNotifier extends ChangeNotifier {
     } else {
       // print("file di delete baru di create lagi");
       file.deleteSync();
-      imageCache!.clear();
+      imageCache.clear();
       // _createFileFromString(data, taskid, nameField);
       if (!file.existsSync()) {
         //   print("file gambar tidak ada,maka file dapat dibuat");

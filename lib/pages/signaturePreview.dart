@@ -17,13 +17,13 @@ class SignaturePreviewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+        data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
         child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
             backgroundColor: AppTheme.warnaUngu,
-            leading: CloseButton(),
-            title: Text('Signature Preview'),
+            leading: const CloseButton(),
+            title: const Text('Signature Preview'),
             centerTitle: true,
             actions: [
               IconButton(

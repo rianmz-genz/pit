@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:pit/helpers/Preferences.dart';
 import 'package:pit/model/mNetwork.dart';
 import 'package:pit/helpers/odoo.dart';
 import 'package:pit/utils/boxData.dart';
@@ -13,14 +12,14 @@ import 'package:pit/viewmodel/vmUser.dart';
 
 class UserNetwork {
   // final String _Url = "https://testpit.odoo.com"; //staging
-  final String _Url = "https://pitelektronik.odoo.com"; //production
+  final String _Url = "http://103.195.30.141:8069"; //production
 
   String generateMd5(String input) {
     return md5.convert(utf8.encode(input)).toString();
   }
 
-  Future<Network> getUserOtp(String strSecretKey, String strPhone, String otp,
-      String user_token, int user_active) async {
+  Future<Network> getUserOtp(String strSecretKey, String userLogin, String otp,
+      String userToken, int userActive) async {
     OdooServer objOdooServer = OdooServer();
     Network objNetwork = Network(Status: false);
 
@@ -34,15 +33,16 @@ class UserNetwork {
       dynamic objParam = {
         "jsonrpc": "2.0",
         "params": {
-          "phone": strPhone,
+          "user_login": userLogin,
           "otp": otp,
           "secretkey": strSecretKey,
-          "usertoken": user_token,
-          "user_active": user_active
+          "usertoken": userToken,
+          "user_active": userActive
         }
       };
 
       var request = http.Request('POST', Uri.parse('$_Url/user/otp'));
+      print(objParam);
       request.body = json.encode(objParam);
       request.headers.addAll(headers);
       //TODO try catch
@@ -65,7 +65,6 @@ class UserNetwork {
               print("otp status true");
               objNetwork.Status = true;
               dynamic objUser = objNetwork.Data;
-
               // print(objUser["picprofile"]);
 
               Directory appDocumentsDirectory =
@@ -77,12 +76,13 @@ class UserNetwork {
               final base64Encode = base64.decode(objUser["picprofile"]);
               var file = File('$appDocumentsPath/profile_User.png');
               await file.writeAsBytes(base64Encode);
+              print('response login otp ${objUser}');
 
               vmUser objVmUser = vmUser();
               if (objUser["picprofile"] == "") {
                 await objVmUser.getEditUser(
                     Name: objUser["name"],
-                    Phone: strPhone,
+                    Phone: userLogin,
                     Area: objUser["area"] == false ? "" : objUser["area"],
                     Kemampuan: objUser['skill'].join(', '),
                     Status: objUser['type'],
@@ -90,7 +90,7 @@ class UserNetwork {
               } else {
                 await objVmUser.getEditUser(
                     Name: objUser["name"],
-                    Phone: strPhone,
+                    Phone: userLogin,
                     Area: objUser["area"] == false ? "" : objUser["area"],
                     Kemampuan: objUser['skill'].join(', '),
                     Status: objUser['type'],
@@ -100,13 +100,14 @@ class UserNetwork {
               boxdata.setLoginCredential(
                   secretKey: objUser["secretkey"],
                   token: lstHeader["set-cookie"].toString(),
-                  Phone: strPhone,
+                  Phone: userLogin,
                   UserId: objUser["id"].toString(),
                   Otp: otp);
             }
           }
         }
       } catch (e) {
+        print("eerorrr otp ${e}");
         objNetwork.Message = "anda tidak terhubung ke jaringan internet";
       }
 
@@ -203,17 +204,18 @@ class UserNetwork {
     }
   }
 
-  Future<Network> getUserLogin(String strPhone) async {
+  Future<Network> getUserLogin(String userLogin) async {
     OdooServer objOdooServer = OdooServer();
     Network objNetwork = Network(Status: false);
 
     dynamic headers = await objOdooServer.getHeaderApiParam();
     dynamic objParam = {
       "jsonrpc": "2.0",
-      "params": {"phone": strPhone}
+      "params": {"user_login": userLogin}
     };
 
     var request = http.Request('POST', Uri.parse('$_Url/user/login'));
+    print('urlnya ${Uri.parse('$_Url/user/login')}');
     request.body = json.encode(objParam);
     request.headers.addAll(headers);
     try {
@@ -227,10 +229,11 @@ class UserNetwork {
 
           if (objNetwork.Status) {
             final boxdata = boxData(nameBox: "box_setLoginCredential");
+            print('response login phone ${objNetwork.Data}');
             await boxdata.setLoginCredential(
                 secretKey: objNetwork.Data["secretkey"],
                 token: "",
-                Phone: strPhone,
+                Phone: userLogin,
                 UserId: "",
                 Otp: "");
           }
@@ -259,7 +262,7 @@ class UserNetwork {
     final boxdata = boxData(nameBox: "box_setLoginCredential");
     String strSecretKey = await boxdata.getLoginCredential(param: "secretKey");
 
-    var bytes;
+    Uint8List bytes;
     String base64Encode = "";
     if (PicProfile.path.toString() != "") {
       bytes = PicProfile.readAsBytesSync();

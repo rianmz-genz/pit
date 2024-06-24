@@ -25,13 +25,15 @@ class TaskDetail extends StatelessWidget {
   int idMessage;
 
   TaskDetail(
-      this.Task, this.statusTask, this.dataStsWrkShtServer, this.idMessage);
+      this.Task, this.statusTask, this.dataStsWrkShtServer, this.idMessage,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context)
+          .copyWith(textScaler: const TextScaler.linear(1.0)),
       child: WillPopScope(
         onWillPop: () async {
           final BoxData = boxData(nameBox: "box_MarkedPage");
@@ -59,7 +61,7 @@ class TaskDetail extends StatelessWidget {
                 }
                 Navigator.of(context).pop(false);
               },
-              icon: Icon(Icons.keyboard_arrow_left, size: 40),
+              icon: const Icon(Icons.keyboard_arrow_left, size: 40),
             ),
             centerTitle: true,
             title: Text(
@@ -85,7 +87,8 @@ class TaskDetailWidget extends StatefulWidget {
   int idMessage;
 
   TaskDetailWidget(
-      this.Task, this.statusTask, this.dataStsWrkShtServer, this.idMessage);
+      this.Task, this.statusTask, this.dataStsWrkShtServer, this.idMessage,
+      {super.key});
 
   @override
   State<TaskDetailWidget> createState() => _TaskDetailWidgetState();
@@ -148,28 +151,28 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
   btnLanjutkan(String userid, dynamic objDataTask) async {
     if (widget.Task.containsKey("direct")) {
       final box = boxData(nameBox: "box_worksheetform");
-      var int_taskid;
-      var String_taskid;
+      var intTaskid;
+      var stringTaskid;
       if (widget.Task['id'].runtimeType == String) {
-        int_taskid = int.parse(widget.Task['id']);
-        String_taskid = widget.Task['id'];
+        intTaskid = int.parse(widget.Task['id']);
+        stringTaskid = widget.Task['id'];
       } else {
-        int_taskid = widget.Task['id'];
-        String_taskid = widget.Task['id'].toString();
+        intTaskid = widget.Task['id'];
+        stringTaskid = widget.Task['id'].toString();
       }
       if (widget.Task['direct'].runtimeType == String) {
         if (widget.Task['direct'] == 'true') {
           //get form and value lpu
 
-          await box.getFormWorksheet(int_taskid);
+          await box.getFormWorksheet(intTaskid);
           await box.getValueWork(
-              int_taskid, int.parse(userid), widget.Task['handoff']);
+              intTaskid, int.parse(userid), widget.Task['handoff']);
         }
       } else if (widget.Task['direct'].runtimeType == bool) {
         if (widget.Task['direct']) {
-          await box.getFormWorksheet(int_taskid);
+          await box.getFormWorksheet(intTaskid);
           await box.getValueWork(
-              int_taskid, int.parse(userid), widget.Task['handoff']);
+              intTaskid, int.parse(userid), widget.Task['handoff']);
         }
       }
     }
@@ -316,8 +319,8 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
             values: Map<String, dynamic>.from(widget.Task));
 
         //add task detail
-        var box_AddDetail = Hive.box("box_detailPekerjaan");
-        box_AddDetail.put(
+        var boxAdddetail = Hive.box("box_detailPekerjaan");
+        boxAdddetail.put(
           widget.Task['id'].toString(),
           objDataTask,
         );
@@ -345,7 +348,7 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
         //TODO:roots setelah terima task
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (context) => HomeScreen(1),
+              builder: (context) => const HomeScreen(1),
             ),
             (route) => false);
 
@@ -419,7 +422,7 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
           }
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                builder: (context) => HomeScreen(0),
+                builder: (context) => const HomeScreen(0),
               ),
               (route) => false);
           // Navigator.pushReplacement(
@@ -439,7 +442,6 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
       //kalo pekerjaan udah di ambil
 
       //
-
     } else {
       final downMessage = PopupError();
       downMessage.showError(context, cekKoneksi, false, mounted);
@@ -454,7 +456,7 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
     }
     //
     markedPage();
-    dynamic objData = null;
+    dynamic objData;
     String StatusTask;
     TaskNetwork objTaskNetwork = TaskNetwork();
     WorksheetNetwork objWorksheetNetwork = WorksheetNetwork();
@@ -473,7 +475,7 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
         widget.Task['handoff'] = false;
       }
     }
-    if (widget.idMessage > 0 && widget.idMessage != null) {
+    if (widget.idMessage > 0) {
       print('udah dapet result sebelum ke udpate notif');
       final notifUpdate = boxData(nameBox: "box_listMessages");
       await notifUpdate.updateMessage(idmessage: widget.idMessage);
@@ -488,12 +490,12 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
         }
       } catch (e) {}
       await Hive.openBox("box_listMessages");
-      final box_OpenListMessage = await Hive.openBox("box_listMessages");
+      final boxOpenlistmessage = await Hive.openBox("box_listMessages");
       final updateNotif = boxData(nameBox: "box_loncengNotif");
 
-      if (box_OpenListMessage.isOpen) {
-        if (box_OpenListMessage.isNotEmpty) {
-          var dataLocal = box_OpenListMessage.get(userId);
+      if (boxOpenlistmessage.isOpen) {
+        if (boxOpenlistmessage.isNotEmpty) {
+          var dataLocal = boxOpenlistmessage.get(userId);
           if (dataLocal != null) {
             for (var check in dataLocal) {
               print(check);
@@ -537,13 +539,13 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
         }
         print(result);
         // print("sampe sini dip");
-        var box_AddDetail = Hive.box("box_detailPekerjaan");
-        var box_DetailList = await Hive.openBox("box_detailPekerjaan");
-        final data = box_DetailList.get(widget.Task['id'].toString());
+        var boxAdddetail = Hive.box("box_detailPekerjaan");
+        var boxDetaillist = await Hive.openBox("box_detailPekerjaan");
+        final data = boxDetaillist.get(widget.Task['id'].toString());
 
-        if (box_DetailList.isNotEmpty) {
+        if (boxDetaillist.isNotEmpty) {
           if (data == null) {
-            box_AddDetail.put(widget.Task['id'].toString(), result);
+            boxAdddetail.put(widget.Task['id'].toString(), result);
             return result;
           } else {
             // use data
@@ -552,22 +554,22 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
                 data[i] = result[i];
               }
             });
-            box_AddDetail.put(widget.Task['id'].toString(), data);
+            boxAdddetail.put(widget.Task['id'].toString(), data);
             objData = result;
             print(objData);
             return objData;
           }
         } else {
-          box_AddDetail.put(widget.Task['id'].toString(), result);
+          boxAdddetail.put(widget.Task['id'].toString(), result);
         }
 
         //
       }
     } else {
-      var box_DetailList = await Hive.openBox("box_detailPekerjaan");
+      var boxDetaillist = await Hive.openBox("box_detailPekerjaan");
 
-      if (box_DetailList.isNotEmpty) {
-        final data = box_DetailList.get(widget.Task['id'].toString());
+      if (boxDetaillist.isNotEmpty) {
+        final data = boxDetaillist.get(widget.Task['id'].toString());
         // use data
         if (data != null) {
           objData = data;
@@ -597,9 +599,10 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
           dynamic objDataTask = snapshot.data!;
 
           return MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(1.0)),
             child: Container(
-              margin: EdgeInsets.all(20),
+              margin: const EdgeInsets.all(20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -634,9 +637,9 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
                     child: Center(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: AppTheme.warnaHijau,
-                          minimumSize: Size(289, 63),
-                          padding: EdgeInsets.only(left: 43, right: 43),
+                          backgroundColor: AppTheme.warnaHijau,
+                          minimumSize: const Size(289, 63),
+                          padding: const EdgeInsets.only(left: 43, right: 43),
                           shape: const RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(72.5)),
@@ -686,7 +689,7 @@ class _TaskDetailWidgetState extends State<TaskDetailWidget> {
           );
         }
 
-        return Center(
+        return const Center(
             child: CircularProgressIndicator(
           color: AppTheme.warnaHijau,
         ));
@@ -722,14 +725,15 @@ class DetailWidget extends StatelessWidget {
   String Title;
   dynamic Value;
 
-  DetailWidget({required this.Title, required this.Value});
+  DetailWidget({super.key, required this.Title, required this.Value});
 
   @override
   Widget build(BuildContext context) {
     MySize().init(context);
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context)
+          .copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Container(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

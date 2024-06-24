@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -19,16 +18,16 @@ import '../helpers/Preferences.dart';
 import '../themes/AppTheme.dart';
 
 class Profile extends StatefulWidget {
-  User _User;
+  final User _User;
 
-  Profile(this._User);
+  const Profile(this._User, {super.key});
 
   @override
-  State<Profile> createState() => _ProfileState(this._User);
+  State<Profile> createState() => _ProfileState(_User);
 }
 
 class _ProfileState extends State<Profile> {
-  User _User;
+  final User _User;
 
   _ProfileState(this._User);
 
@@ -57,30 +56,33 @@ class _ProfileState extends State<Profile> {
       Directory appDocumentsDirectory =
           await getApplicationDocumentsDirectory();
       String appDocumentsPath = appDocumentsDirectory.path;
-      // bool cekdata = false;
-      // String dir = (await getApplicationDocumentsDirectory()).path;
-      // File file = File('$appDocumentsPath/profile_User.jpg');
-      // cekdata = await file.exists();
-      // if (pickedFile != null) {
-      //   if (cekdata) {
-      //     file.delete();
-      //   }
-      // }
-      _image = image;
-      _imageSelect = image;
-      setState(() {});
+
+      setState(() {
+        _image = image;
+        _imageSelect = image;
+      });
     }
   }
 
   _imgFromGallery() async {
-    final pickedFile =
-        await _picker.getImage(source: ImageSource.gallery, imageQuality: 25);
-    if (pickedFile != null) {
-      File image = File(pickedFile.path);
-      print(image.path);
-      _image = image;
-      _imageSelect = image;
-      setState(() {});
+    try {
+      final pickedFile =
+          await _picker.getImage(source: ImageSource.gallery, imageQuality: 10);
+      print(pickedFile);
+      if (pickedFile != null) {
+        File image = File(pickedFile.path);
+        print(image.path);
+        _image = image;
+        _imageSelect = image;
+        setState(() {});
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Tidak mendapatkan aksess file')));
+      }
+    } catch (e) {
+      print("error gallery ${e}");
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tidak mendapatkan aksess file')));
     }
   }
 
@@ -95,14 +97,15 @@ class _ProfileState extends State<Profile> {
             child: Container(
               child: Wrap(
                 children: <Widget>[
-                  ListTile(
-                      leading: const Icon(Icons.photo_library),
-                      title: Text('Photo Library',
-                          style: AppTheme.OpenSans400(14, Color(0xFF333333))),
-                      onTap: () {
-                        _imgFromGallery();
-                        Navigator.of(context).pop();
-                      }),
+                  // ListTile(
+                  //     leading: const Icon(Icons.photo_library),
+                  //     title: Text('Photo Library',
+                  //         style: AppTheme.OpenSans400(
+                  //             14, const Color(0xFF333333))),
+                  //     onTap: () {
+                  //       _imgFromGallery();
+                  //       Navigator.of(context).pop();
+                  //     }),
                   ListTile(
                     leading: const Icon(Icons.photo_camera),
                     title: Text('Camera',
@@ -130,7 +133,6 @@ class _ProfileState extends State<Profile> {
     myAreaController.text = _User.Area.toString();
     myPhonenumberController.text = _User.Phone.toString();
     mySkillController.text = _User.Kemampuan.toString();
-    ;
     _image = File(_User.Picture.toString());
   }
 
@@ -144,7 +146,8 @@ class _ProfileState extends State<Profile> {
     MySize().init(context);
     ThemeData themeData = Theme.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context)
+          .copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: AppTheme.warnaUngu,
@@ -208,7 +211,8 @@ class _ProfileState extends State<Profile> {
                         children: [
                           Text(
                             _User.Name.toString(),
-                            style: AppTheme.OpenSans600(16, Color(0xFF272E3D)),
+                            style: AppTheme.OpenSans600(
+                                16, const Color(0xFF272E3D)),
                           ),
                         ],
                       ),
@@ -226,7 +230,7 @@ class _ProfileState extends State<Profile> {
                                     color: Color(0xFF00A09D),
                                     width: 2,
                                     style: BorderStyle.solid),
-                                primary: Colors.white,
+                                backgroundColor: Colors.white,
                                 minimumSize: const Size(130, 38),
                                 padding:
                                     const EdgeInsets.only(left: 37, right: 37),
@@ -240,8 +244,8 @@ class _ProfileState extends State<Profile> {
                               },
                               child: Text(
                                 "Ubah Foto",
-                                style:
-                                    AppTheme.OpenSans500(15, Color(0xFF00A09D)),
+                                style: AppTheme.OpenSans500(
+                                    15, const Color(0xFF00A09D)),
                               ),
                             ),
                           ),
@@ -252,7 +256,8 @@ class _ProfileState extends State<Profile> {
                             top: fit(20.0, MediaQuery.of(context).size.height)),
                         child: Text(
                           "Nama",
-                          style: AppTheme.OpenSans500(10, Color(0xFF737373)),
+                          style:
+                              AppTheme.OpenSans500(10, const Color(0xFF737373)),
                         ),
                       ),
                       Container(
@@ -284,7 +289,8 @@ class _ProfileState extends State<Profile> {
                             top: fit(10.0, MediaQuery.of(context).size.height)),
                         child: Text(
                           "Nomor Ponsel",
-                          style: AppTheme.OpenSans500(10, Color(0xFF737373)),
+                          style:
+                              AppTheme.OpenSans500(10, const Color(0xFF737373)),
                         ),
                       ),
                       Container(
@@ -294,7 +300,8 @@ class _ProfileState extends State<Profile> {
                                   fit(5.0, MediaQuery.of(context).size.height)),
                           child: TextFormField(
                             enabled: false,
-                            style: AppTheme.OpenSans400(15, Color(0xff000000)),
+                            style: AppTheme.OpenSans400(
+                                15, const Color(0xff000000)),
                             controller: myPhonenumberController,
                             maxLines: 1, // max baris
                             decoration: InputDecoration.collapsed(
@@ -325,7 +332,8 @@ class _ProfileState extends State<Profile> {
                             top: fit(10.0, MediaQuery.of(context).size.height)),
                         child: Text(
                           "Area",
-                          style: AppTheme.OpenSans500(10, Color(0xFF737373)),
+                          style:
+                              AppTheme.OpenSans500(10, const Color(0xFF737373)),
                         ),
                       ),
                       Container(
@@ -361,7 +369,8 @@ class _ProfileState extends State<Profile> {
                             top: fit(10.0, MediaQuery.of(context).size.height)),
                         child: Text(
                           "KEMAMPUAN",
-                          style: AppTheme.OpenSans500(10, Color(0xFF737373)),
+                          style:
+                              AppTheme.OpenSans500(10, const Color(0xFF737373)),
                         ),
                       ),
                       Container(
@@ -400,7 +409,8 @@ class _ProfileState extends State<Profile> {
                             top: fit(10.0, MediaQuery.of(context).size.height)),
                         child: Text(
                           "STATUS",
-                          style: AppTheme.OpenSans500(10, Color(0xFF737373)),
+                          style:
+                              AppTheme.OpenSans500(10, const Color(0xFF737373)),
                         ),
                       ),
                       Container(
@@ -554,8 +564,8 @@ class _ProfileState extends State<Profile> {
                           child: Center(
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                primary: AppTheme.warnaHijau,
-                                minimumSize: Size(330, 50),
+                                backgroundColor: AppTheme.warnaHijau,
+                                minimumSize: const Size(330, 50),
                                 padding:
                                     const EdgeInsets.only(left: 37, right: 37),
                                 shape: const RoundedRectangleBorder(
@@ -595,8 +605,7 @@ class _ProfileState extends State<Profile> {
                                     }
                                     Preferences pref = Preferences();
 
-                                    int user_active =
-                                        await pref.getUserActive();
+                                    int userActive = await pref.getUserActive();
                                     UserNetwork objUserNetwork = UserNetwork();
                                     Network objNetwork =
                                         await objUserNetwork.getUserEdit(
@@ -605,7 +614,7 @@ class _ProfileState extends State<Profile> {
                                             Area: nArea,
                                             Reason: nReason,
                                             PicProfile: newImage,
-                                            user_active: user_active);
+                                            user_active: userActive);
                                     if (objNetwork.Status) {
                                       vmUser objUser = vmUser();
                                       await objUser.getEditUser(
@@ -630,8 +639,8 @@ class _ProfileState extends State<Profile> {
                               },
                               child: Text(
                                 "Simpan",
-                                style:
-                                    AppTheme.OpenSans500(17, Color(0xFFFFFFFF)),
+                                style: AppTheme.OpenSans500(
+                                    17, const Color(0xFFFFFFFF)),
                               ),
                             ),
                           )),
@@ -650,13 +659,13 @@ class _ProfileState extends State<Profile> {
 
                       String userId =
                           await boxdata.getLoginCredential(param: "userId");
-                      final box_OpenDataUpload =
+                      final boxOpendataupload =
                           await Hive.openBox("box_listUploadWorksheet");
-                      final box_AddnDataUpload =
-                          await Hive.box("box_listUploadWorksheet");
+                      final boxAddndataupload =
+                          Hive.box("box_listUploadWorksheet");
 
                       bool checkdata = false;
-                      if (box_OpenDataUpload.isNotEmpty) {}
+                      if (boxOpendataupload.isNotEmpty) {}
                       await showDialog(
                             //show confirm dialogue
                             //the return value will be from "Yes" or "No" options
@@ -668,8 +677,8 @@ class _ProfileState extends State<Profile> {
                               ),
                               // content: Text('Do you want to exit an App?'),
                               content: MediaQuery(
-                                data: MediaQuery.of(context)
-                                    .copyWith(textScaleFactor: 1.0),
+                                data: MediaQuery.of(context).copyWith(
+                                    textScaler: const TextScaler.linear(1.0)),
                                 child: Container(
                                   child: Wrap(
                                     children: [
@@ -691,10 +700,11 @@ class _ProfileState extends State<Profile> {
                                                 child: ElevatedButton(
                                                   style:
                                                       ElevatedButton.styleFrom(
-                                                    onPrimary: Colors.white,
                                                     // elevation: 13,
-                                                    primary: Colors.white,
-                                                    minimumSize: Size(180, 40),
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    minimumSize:
+                                                        const Size(180, 40),
                                                     padding:
                                                         const EdgeInsets.only(
                                                             left: 37,
@@ -717,20 +727,19 @@ class _ProfileState extends State<Profile> {
                                                             .getLoginCredential(
                                                                 param:
                                                                     "userId");
-                                                    final box_OpenDataUpload =
+                                                    final boxOpendataupload =
                                                         await Hive.openBox(
                                                             "box_listUploadWorksheet");
-                                                    final box_AddnDataUpload =
-                                                        await Hive.box(
+                                                    final boxAddndataupload =
+                                                        Hive.box(
                                                             "box_listUploadWorksheet");
 
                                                     bool checkdata = false;
-                                                    if (box_OpenDataUpload
+                                                    if (boxOpendataupload
                                                         .isNotEmpty) {
-                                                      if (userId != null &&
-                                                          userId != 0) {
+                                                      if (userId != 0) {
                                                         final data =
-                                                            box_OpenDataUpload
+                                                            boxOpendataupload
                                                                 .get(userId);
                                                         if (data != null &&
                                                             data.length != 0) {
@@ -782,10 +791,9 @@ class _ProfileState extends State<Profile> {
                                               Expanded(
                                                   child: ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
-                                                  onPrimary:
-                                                      AppTheme.warnaHijau,
                                                   // elevation: 13,
-                                                  primary: AppTheme.warnaHijau,
+                                                  backgroundColor:
+                                                      AppTheme.warnaHijau,
                                                   minimumSize:
                                                       const Size(180, 40),
                                                   padding:
@@ -821,7 +829,7 @@ class _ProfileState extends State<Profile> {
                                   ),
                                 ),
                               ),
-                              actions: [],
+                              actions: const [],
                             ),
                           ) ??
                           false;

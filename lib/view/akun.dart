@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:pit/helpers/Preferences.dart';
 import 'package:pit/model/mUser.dart';
@@ -23,9 +21,10 @@ import '../network/CheckDataConnection.dart';
 import '../network/user.dart';
 import '../themes/AppTheme.dart';
 import '../utils/notificationApi.dart';
-import '../viewmodel/vmUser.dart';
 
 class Account extends StatefulWidget {
+  const Account({super.key});
+
   @override
   State<Account> createState() => _AccountState();
 }
@@ -68,7 +67,7 @@ class _AccountState extends State<Account> {
       create: (context) => UserNotifier(),
       child: Builder(builder: (BuildContext context) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
           child: Scaffold(
             appBar: AppBar(
               backgroundColor: AppTheme.warnaUngu,
@@ -92,20 +91,20 @@ class DetailAkun extends StatelessWidget {
   String Title;
   String Value;
 
-  DetailAkun({required this.Title, required this.Value});
+  DetailAkun({super.key, required this.Title, required this.Value});
 
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Container(
-        margin: EdgeInsets.fromLTRB(15, 10, 20, 10),
+        margin: const EdgeInsets.fromLTRB(15, 10, 20, 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               Title,
-              style: AppTheme.OpenSans600LS(15, Color(0xff323333), -0.26),
+              style: AppTheme.OpenSans600LS(15, const Color(0xff323333), -0.26),
             ),
             Text(
               Value,
@@ -122,20 +121,20 @@ class MenuOption extends StatelessWidget {
   String Title;
   final Widget Event;
 
-  MenuOption({required this.Title, required this.Event});
+  MenuOption({super.key, required this.Title, required this.Event});
 
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Container(
         child: ListTile(
           dense: true,
           title: Text(
             Title,
-            style: AppTheme.OpenSans500LS(16, Color(0xFF323333), -0.27),
+            style: AppTheme.OpenSans500LS(16, const Color(0xFF323333), -0.27),
           ),
-          trailing: Icon(Icons.arrow_forward_ios),
+          trailing: const Icon(Icons.arrow_forward_ios),
           onTap: () async {
             await Navigator.push(
                 context, MaterialPageRoute(builder: (context) => Event));
@@ -154,6 +153,8 @@ class MenuOption extends StatelessWidget {
 class UserView extends StatelessWidget {
   int countData = 0;
   bool active = false;
+
+  UserView({super.key});
   getDataProfile(BuildContext context) async {
     showDialog(
       context: context,
@@ -167,11 +168,11 @@ class UserView extends StatelessWidget {
             child: Container(
               width: 300 * MySize.scaleFactorWidth,
               height: 200 * MySize.scaleFactorHeight,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.all(Radius.circular(8))),
-              child: Column(
+              child: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(
@@ -214,11 +215,11 @@ class UserView extends StatelessWidget {
     print("Cek Koneksi getDataProfile");
     print('hasilnya: ${cekKoneksi.Status}');
     if (cekKoneksi.Status) {
-      String user_token = "";
+      String userToken = "";
       var OpenUserToken = await Hive.openBox("box_usertoken");
-      user_token = OpenUserToken.get(phone);
-      bool statUser_active = false;
-      int user_active = await pref.getUserActive();
+      userToken = OpenUserToken.get(phone);
+      bool statuserActive = false;
+      int userActive = await pref.getUserActive();
 
       Network objNetwork =
           await objUserNetwork.getUserProfile(userid, otp, phone);
@@ -241,9 +242,9 @@ class UserView extends StatelessWidget {
 
     return Consumer<UserNotifier>(builder: (_, value, __) {
       User _User = value.getUser();
-      int user_active = value.getuser_active();
+      int userActive = value.getuser_active();
 
-      if (user_active == 1) {
+      if (userActive == 1) {
         active = true;
       } else {
         active = false;
@@ -274,10 +275,10 @@ class UserView extends StatelessWidget {
           // }
         },
         child: MediaQuery(
-          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
           child: ListView(
             children: [
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Stack(
                 children: [
                   Padding(
@@ -293,7 +294,7 @@ class UserView extends StatelessWidget {
                             shape: BoxShape.circle,
                             image: _User.Picture.toString() == "" ||
                                     _User.Picture == ""
-                                ? DecorationImage(
+                                ? const DecorationImage(
                                     image: AssetImage(
                                         "./assets/images/default_gambar.png"),
                                     fit: BoxFit.fill)
@@ -329,7 +330,7 @@ class UserView extends StatelessWidget {
                 children: [
                   Text(
                     _User.Name.toString(),
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black,
                         fontFamily: 'OpenSans',
@@ -352,7 +353,7 @@ class UserView extends StatelessWidget {
               // MenuOption(Title: "Pusat Bantuan", Event: HomeScreen(1)),
               MenuOption(Title: "Pusat Bantuan", Event: HelpCenter()),
               const Divider(color: Colors.black),
-              MenuOption(Title: "Tentang", Event: AboutUs()),
+              MenuOption(Title: "Tentang", Event: const AboutUs()),
               const Divider(color: Colors.black),
               // MenuOption(Title: "Bahasa", Event: HomeScreen(1)),
               // Divider(color: Colors.black),
@@ -362,9 +363,9 @@ class UserView extends StatelessWidget {
                   Container(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.white,
-                        minimumSize: Size(300, 55),
-                        padding: EdgeInsets.only(left: 37, right: 37),
+                        backgroundColor: Colors.white,
+                        minimumSize: const Size(300, 55),
+                        padding: const EdgeInsets.only(left: 37, right: 37),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
@@ -381,13 +382,13 @@ class UserView extends StatelessWidget {
 
                           String userId =
                               await boxdata.getLoginCredential(param: "userId");
-                          var box_OpenDataUpload =
+                          var boxOpendataupload =
                               await Hive.openBox("box_listUploadWorksheet");
 
                           bool checkdata = false;
-                          if (box_OpenDataUpload.isNotEmpty) {
-                            if (userId != null && userId != 0) {
-                              final data = box_OpenDataUpload.get(userId);
+                          if (boxOpendataupload.isNotEmpty) {
+                            if (userId != 0) {
+                              final data = boxOpendataupload.get(userId);
                               if (data != null && data.length != 0) {
                                 countData = data.length;
                                 for (var val in data) {
@@ -411,7 +412,7 @@ class UserView extends StatelessWidget {
                                   // content: Text('Do you want to exit an App?'),
                                   content: MediaQuery(
                                     data: MediaQuery.of(context)
-                                        .copyWith(textScaleFactor: 1.0),
+                                        .copyWith(textScaler: const TextScaler.linear(1.0)),
                                     child: Container(
                                       child: Wrap(
                                         children: [
@@ -434,7 +435,7 @@ class UserView extends StatelessWidget {
                                                                   Colors.black),
                                                         ),
                                                         Text(
-                                                          "${countData} ",
+                                                          "$countData ",
                                                           style: AppTheme
                                                               .OpenSans500(15,
                                                                   Colors.red),
@@ -465,13 +466,13 @@ class UserView extends StatelessWidget {
                                                     child: ElevatedButton(
                                                       style: ElevatedButton
                                                           .styleFrom(
-                                                        onPrimary: Colors.white,
                                                         // elevation: 13,
-                                                        primary: Colors.white,
+                                                        backgroundColor:
+                                                            Colors.white,
                                                         minimumSize:
-                                                            Size(180, 40),
+                                                            const Size(180, 40),
                                                         padding:
-                                                            EdgeInsets.only(
+                                                            const EdgeInsets.only(
                                                                 left: 37,
                                                                 right: 37),
                                                         shape:
@@ -536,7 +537,7 @@ class UserView extends StatelessWidget {
                                                               MaterialPageRoute(
                                                                 builder:
                                                                     (context) =>
-                                                                        LoginPhone(),
+                                                                        const LoginPhone(),
                                                               ));
                                                           // await SystemChannels
                                                           //     .platform
@@ -590,10 +591,8 @@ class UserView extends StatelessWidget {
                                                       child: ElevatedButton(
                                                     style: ElevatedButton
                                                         .styleFrom(
-                                                      onPrimary:
-                                                          AppTheme.warnaHijau,
                                                       // elevation: 13,
-                                                      primary:
+                                                      backgroundColor:
                                                           AppTheme.warnaHijau,
                                                       minimumSize:
                                                           const Size(180, 40),
@@ -632,7 +631,7 @@ class UserView extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  actions: [],
+                                  actions: const [],
                                 ),
                               ) ??
                               false;
@@ -648,22 +647,22 @@ class UserView extends StatelessWidget {
                       },
                       child: Text(
                         "Logout",
-                        style: AppTheme.OpenSans600(17, Color(0xff979797)),
+                        style: AppTheme.OpenSans600(17, const Color(0xff979797)),
                       ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
                       child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: !active ? Colors.red : Colors.green,
-                      minimumSize: Size(300, 55),
-                      padding: EdgeInsets.only(left: 37, right: 37),
+                      backgroundColor: !active ? Colors.red : Colors.green,
+                      minimumSize: const Size(300, 55),
+                      padding: const EdgeInsets.only(left: 37, right: 37),
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
@@ -717,7 +716,7 @@ class UserView extends StatelessWidget {
                   )),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -728,7 +727,7 @@ class UserView extends StatelessWidget {
 
 class buttonUserActive extends StatefulWidget {
   dynamic User;
-  buttonUserActive(this.User);
+  buttonUserActive(this.User, {super.key});
 
   @override
   _buttonUserActiveState createState() => _buttonUserActiveState();
@@ -765,8 +764,8 @@ class _buttonUserActiveState extends State<buttonUserActive> {
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        primary: !active ? Colors.red : Colors.green,
-        minimumSize: Size(300, 55),
+        backgroundColor: !active ? Colors.red : Colors.green,
+        minimumSize: const Size(300, 55),
         padding: const EdgeInsets.only(left: 37, right: 37),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(20)),

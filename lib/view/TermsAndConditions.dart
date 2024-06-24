@@ -144,13 +144,15 @@ Kami akan selalu menjaga data pribadi Anda dengan mengacu pada Syarat dan Ketent
 1. Syarat dan Ketentuan ini dapat diterjemahkan ke bahasa asing lainnya selain Bahasa Indonesia yang disediakan oleh Kami. Terdapat kemungkinan bahwa beberapa bagian dalam Syarat dan Ketentuan ini memiliki arti, maksud, atau pengertian yang berbeda ketika diterjemahkan ke bahasa asing lainnya. Apabila terdapat perbedaan penafsiran antara versi Bahasa Indonesia dan versi bahasa asing, maka versi Bahasa Indonesia yang akan berlaku dan Anda dianjurkan untuk merujuk kepada versi Bahasa Indonesia.
 
 ''';
+
+  const TermsAndConditions({super.key});
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Terms and Conditions"),
+          title: const Text("Terms and Conditions"),
         ),
         body: Column(
           children: [

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pit/themes/AppTheme.dart';
 import 'package:pit/utils/SizeConfig.dart';
@@ -56,7 +55,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                         margin: const EdgeInsets.all(8),
                         child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              primary: AppTheme.warnaHijau,
+                              backgroundColor: AppTheme.warnaHijau,
                               // minimumSize: Size(15, 33),
                               // padding: EdgeInsets.only(left: 43, right: 43),
                               // shape: const RoundedRectangleBorder(
@@ -76,7 +75,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                                   toggleFlash = "On";
                                 }
 
-                                return Text('Flash ${toggleFlash}');
+                                return Text('Flash $toggleFlash');
                               },
                             )),
                       ),
@@ -84,7 +83,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                       //   margin: const EdgeInsets.all(8),
                       //   child: ElevatedButton(
                       //     style: ElevatedButton.styleFrom(
-                      //       primary: result != null
+                      //       backgroundColor:  result != null
                       //           ? AppTheme.warnaHijau
                       //           : Colors.grey,
                       //       // minimumSize: Size(15, 33),

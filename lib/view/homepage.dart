@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -25,6 +24,8 @@ import '../utils/boxData.dart';
 import '../utils/getLocation.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   // bool? trigger_notif;
   // Function(bool)? callback;
   // HomePage({this.trigger_notif, this.callback});
@@ -72,12 +73,12 @@ class _HomePageState extends State<HomePage> {
     final boxdata = boxData(nameBox: "box_setLoginCredential");
 
     String userId = await boxdata.getLoginCredential(param: "userId");
-    var openbox_dashboard = await Hive.openBox("box_dashboard");
+    var openboxDashboard = await Hive.openBox("box_dashboard");
 
-    if (openbox_dashboard.isOpen) {
-      var insertBox_dashboard = Hive.box("box_dashboard");
-      if (openbox_dashboard.isNotEmpty) {
-        var dataDasboardDB = openbox_dashboard.get(userId);
+    if (openboxDashboard.isOpen) {
+      var insertboxDashboard = Hive.box("box_dashboard");
+      if (openboxDashboard.isNotEmpty) {
+        var dataDasboardDB = openboxDashboard.get(userId);
 
         if (dataDasboardDB != null) {
           dataDasboard = dataDasboardDB;
@@ -103,13 +104,13 @@ class _HomePageState extends State<HomePage> {
         await Hive.box("box_loncengNotif").close();
       }
       await Hive.openBox("box_loncengNotif");
-      var openbox_loncengNotif = await Hive.openBox("box_loncengNotif");
+      var openboxLoncengnotif = await Hive.openBox("box_loncengNotif");
 
-      if (openbox_loncengNotif.isOpen) {
+      if (openboxLoncengnotif.isOpen) {
         final update = Hive.box("box_loncengNotif");
 
-        if (openbox_loncengNotif.isNotEmpty) {
-          var data = openbox_loncengNotif.get(userid);
+        if (openboxLoncengnotif.isNotEmpty) {
+          var data = openboxLoncengnotif.get(userid);
           if (data != null) {
             if (data['loncengNotif'] && updateNotifDashboard) {
               triggerNotif = true;
@@ -127,7 +128,7 @@ class _HomePageState extends State<HomePage> {
           } else {
             final getUserid = boxData(nameBox: "box_setLoginCredential");
             userid = await getUserid.getLoginCredential(param: "userId");
-            var update_locengNotif = Hive.box("box_loncengNotif");
+            var updateLocengnotif = Hive.box("box_loncengNotif");
             Map data = {"loncengNotif": false};
             update.put(userid, data);
             setState(() {});
@@ -135,7 +136,7 @@ class _HomePageState extends State<HomePage> {
         } else {
           final getUserid = boxData(nameBox: "box_setLoginCredential");
           userid = await getUserid.getLoginCredential(param: "userId");
-          var update_locengNotif = Hive.box("box_loncengNotif");
+          var updateLocengnotif = Hive.box("box_loncengNotif");
           Map data = {"loncengNotif": false};
           update.put(userid, data);
           setState(() {});
@@ -175,7 +176,8 @@ class _HomePageState extends State<HomePage> {
     final ThemeData themeData = Theme.of(context);
     MySize().init(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context)
+          .copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -244,15 +246,15 @@ class _HomePageState extends State<HomePage> {
                   child: Builder(builder: (BuildContext context) {
                     return Container(
                       width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: AppTheme.warnaUngu,
                       ),
                       child: Center(
                         child: Consumer<UserNotifier>(builder: (_, value, __) {
                           User _User = value.getUser();
-                          int user_active = value.getuser_active();
+                          int userActive = value.getuser_active();
 
-                          if (user_active == 1) {
+                          if (userActive == 1) {
                             active = true;
                           } else {
                             active = false;
@@ -335,7 +337,7 @@ class _HomePageState extends State<HomePage> {
 
 class dashboard extends StatefulWidget {
   Map dataDasboard;
-  dashboard(this.dataDasboard);
+  dashboard(this.dataDasboard, {super.key});
 
   @override
   _dashboardState createState() => _dashboardState();
@@ -448,12 +450,12 @@ class _dashboardState extends State<dashboard> {
     final boxdata = boxData(nameBox: "box_setLoginCredential");
 
     String userid = await boxdata.getLoginCredential(param: "userId");
-    var openbox_dashboard = await Hive.openBox("box_dashboard");
-    if (openbox_dashboard.isOpen) {
-      var insertBox_dashboard = Hive.box("box_dashboard");
+    var openboxDashboard = await Hive.openBox("box_dashboard");
+    if (openboxDashboard.isOpen) {
+      var insertboxDashboard = Hive.box("box_dashboard");
 
-      if (openbox_dashboard.isNotEmpty) {
-        var dataDasboardDB = openbox_dashboard.get(userid);
+      if (openboxDashboard.isNotEmpty) {
+        var dataDasboardDB = openboxDashboard.get(userid);
 
         if (dataDasboardDB != null) {
           widget.dataDasboard = dataDasboardDB;
@@ -462,20 +464,21 @@ class _dashboardState extends State<dashboard> {
           }
           if (dataDasboardDB['triggerRefresh'] == true) {
             dataDasboardDB['triggerRefresh'] = false;
-            insertBox_dashboard.put(userid, dataDasboardDB);
+            insertboxDashboard.put(userid, dataDasboardDB);
             setState(() {});
           }
         }
       }
     }
-    reloadDashboard = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    reloadDashboard =
+        Timer.periodic(const Duration(seconds: 1), (Timer t) async {
       // isi box upload status worksheet
       // var openbox_dashboard = await Hive.openBox("box_dashboard");
-      if (openbox_dashboard.isOpen) {
-        var insertBox_dashboardd = Hive.box("box_dashboard");
+      if (openboxDashboard.isOpen) {
+        var insertboxDashboardd = Hive.box("box_dashboard");
 
-        if (openbox_dashboard.isNotEmpty) {
-          var dataDasboardDB = openbox_dashboard.get(userid);
+        if (openboxDashboard.isNotEmpty) {
+          var dataDasboardDB = openboxDashboard.get(userid);
 
           if (dataDasboardDB != null) {
             widget.dataDasboard = dataDasboardDB;
@@ -484,7 +487,7 @@ class _dashboardState extends State<dashboard> {
             // }
             if (dataDasboardDB['triggerRefresh'] == true) {
               dataDasboardDB['triggerRefresh'] = false;
-              insertBox_dashboardd.put(userid, dataDasboardDB);
+              insertboxDashboardd.put(userid, dataDasboardDB);
               setState(() {});
             }
           }
@@ -508,7 +511,7 @@ class _dashboardState extends State<dashboard> {
       bool? cekKoneksi = false,
       bool? cekLocation = false}) {
     String Info = "";
-    var HowtoActivLoc = RichText(text: TextSpan(children: []));
+    var HowtoActivLoc = RichText(text: const TextSpan(children: []));
 
     // """
     // Cara aktifkan Location Permission :
@@ -629,9 +632,9 @@ class _dashboardState extends State<dashboard> {
       body: ListView(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppTheme.warnaUngu,
-              borderRadius: const BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(21.0),
                 bottomRight: Radius.circular(21.0),
                 topLeft: Radius.zero,
@@ -646,8 +649,8 @@ class _dashboardState extends State<dashboard> {
                     Container(
                         child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        primary: AppTheme.warnaHijau,
-                        minimumSize: Size(280, 50),
+                        backgroundColor: AppTheme.warnaHijau,
+                        minimumSize: const Size(280, 50),
                         padding: const EdgeInsets.only(left: 37, right: 37),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -664,7 +667,7 @@ class _dashboardState extends State<dashboard> {
                         String resultPOP = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => TaskList(),
+                                builder: (context) => const TaskList(),
                               ),
                             ) ??
                             "";
@@ -678,10 +681,10 @@ class _dashboardState extends State<dashboard> {
                       },
                       child: const Text(
                         "Ambil Pekerjaan",
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     )),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Row(
@@ -723,7 +726,7 @@ class _dashboardState extends State<dashboard> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Container(
@@ -733,7 +736,7 @@ class _dashboardState extends State<dashboard> {
               children: [
                 Text(
                   'Status Pekerjaan Hari Ini',
-                  style: AppTheme.OpenSans400(15, Color(0xFF1F1F21)),
+                  style: AppTheme.OpenSans400(15, const Color(0xFF1F1F21)),
                 ),
                 const SizedBox(
                   height: 6,
@@ -763,13 +766,13 @@ class _dashboardState extends State<dashboard> {
                                     ? widget.dataDasboard['taskPendingKirim']
                                         .toString()
                                     : "0",
-                                style:
-                                    AppTheme.OpenSans500(24, Color(0xFF1F1F21)),
+                                style: AppTheme.OpenSans500(
+                                    24, const Color(0xFF1F1F21)),
                               ),
                               Text(
                                 'Pending',
-                                style:
-                                    AppTheme.OpenSans400(14, Color(0xFF969696)),
+                                style: AppTheme.OpenSans400(
+                                    14, const Color(0xFF969696)),
                               ),
                             ],
                           ),
@@ -780,13 +783,13 @@ class _dashboardState extends State<dashboard> {
                                     ? widget.dataDasboard['taskDikirim']
                                         .toString()
                                     : "0",
-                                style:
-                                    AppTheme.OpenSans500(24, Color(0xFF1F1F21)),
+                                style: AppTheme.OpenSans500(
+                                    24, const Color(0xFF1F1F21)),
                               ),
                               Text(
                                 'Completed',
-                                style:
-                                    AppTheme.OpenSans400(14, Color(0xFF969696)),
+                                style: AppTheme.OpenSans400(
+                                    14, const Color(0xFF969696)),
                               ),
                             ],
                           ),
@@ -797,12 +800,12 @@ class _dashboardState extends State<dashboard> {
                                     ? widget.dataDasboard['selesaiPerDay']
                                         .toString()
                                     : "0",
-                                style:
-                                    AppTheme.OpenSans500(24, Color(0xFF1F1F21)),
+                                style: AppTheme.OpenSans500(
+                                    24, const Color(0xFF1F1F21)),
                               ),
                               Text('Selesai',
                                   style: AppTheme.OpenSans400(
-                                      14, Color(0xFF969696))),
+                                      14, const Color(0xFF969696))),
                             ],
                           ),
                         ],

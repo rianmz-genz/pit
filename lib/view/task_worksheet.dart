@@ -1,9 +1,10 @@
 //16:26  13/04/2022
 
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -22,7 +23,6 @@ import 'package:pit/view/listTimeSheet.dart';
 
 // import 'package:pit/view/select_item.dart';
 import 'package:pit/pages/selectItem.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 // import 'package:pit/view/signature.dart';
 import 'package:pit/pages/signature.dart';
 import 'package:pit/view/task_detail.dart';
@@ -34,6 +34,7 @@ import '../notifier/worksheetFormNotifier.dart';
 import '../pages/information.dart';
 import '../utils/boxData.dart';
 import 'homescreen.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 
 class MenuDrawerWidget extends StatelessWidget {
   dynamic taskid;
@@ -153,7 +154,8 @@ class TaskWorksheetMenu extends StatelessWidget {
   //status_worksheet dari param task respon api tasklist
   String dataStsWrkShtServer;
   TaskWorksheetMenu(this.Task, this.objDataTask, this.tabBar, this.statusTask,
-      this.dataStsWrkShtServer);
+      this.dataStsWrkShtServer,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +165,8 @@ class TaskWorksheetMenu extends StatelessWidget {
         return true;
       },
       child: MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+        data:
+            MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: AppTheme.warnaUngu,
@@ -328,7 +331,6 @@ class TaskWorksheetMenu extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }
 
@@ -359,7 +361,7 @@ box_workSheetSetting(
 class worksheetStop extends StatefulWidget {
   dynamic Task;
   String page2;
-  worksheetStop(this.Task, this.page2);
+  worksheetStop(this.Task, this.page2, {super.key});
   @override
   _worksheetStopState createState() => _worksheetStopState();
 }
@@ -368,6 +370,7 @@ class _worksheetStopState extends State<worksheetStop> {
   String pauseCek = "aktif";
   String btnContinue = "";
   String btnNext = "";
+  String stress = "";
   int page2 = 0;
   Timer? handOff;
   Timer? sendWrksht;
@@ -388,7 +391,7 @@ class _worksheetStopState extends State<worksheetStop> {
 
   //TODO:check mandatory field
   _checkMandatoryField() async {
-    int page2_checkMandatory = 0;
+    int page2Checkmandatory = 0;
     print("checkMandatory from self function");
     print(checkMandatory);
     print(widget.page2);
@@ -399,20 +402,20 @@ class _worksheetStopState extends State<worksheetStop> {
     var data = await objBox.getValueWorksheet(
         taskid: widget.Task['id'].toString(), userid: userId);
     bool result = true;
-    final getBox_worksheetSetting = boxData(nameBox: 'box_workSheetSetting');
-    dynamic data_worksheetSetting =
-        await getBox_worksheetSetting.getValueSettingFormWorksheet(
+    final getboxWorksheetsetting = boxData(nameBox: 'box_workSheetSetting');
+    dynamic dataWorksheetsetting =
+        await getboxWorksheetsetting.getValueSettingFormWorksheet(
                 userid: userId, taskid: widget.Task['id'].toString()) ??
             {};
-    if (data_worksheetSetting != {}) {
-      page2_checkMandatory = data_worksheetSetting['page2'];
+    if (dataWorksheetsetting != {}) {
+      page2Checkmandatory = dataWorksheetsetting['page2'];
       print("page2_checkMandatory");
-      print(page2_checkMandatory);
+      print(page2Checkmandatory);
     } else {
-      page2_checkMandatory = int.parse(widget.page2);
+      page2Checkmandatory = int.parse(widget.page2);
     }
     data.forEach((key, value) {
-      if (page2_checkMandatory == 2) {
+      if (page2Checkmandatory == 2) {
         if (key == 'x_studio_pic_' && (value == '' || value == false)) {
           print('return false 2');
           checkMandatory = false;
@@ -625,6 +628,14 @@ class _worksheetStopState extends State<worksheetStop> {
 
   //
   initBtns() async {
+    final boxdata = boxData(nameBox: "box_setLoginCredential");
+
+    String userID = await boxdata.getLoginCredential(param: "userId");
+
+    var WorksheetForm = await Hive.openBox("box_valworksheet");
+    var ppp = json.encode(WorksheetForm.get(userID)).toString();
+    // print("ppp ${ppp}")
+    stress = ppp;
     if (widget.page2 == 2) {
       btnNext = 'Kirim';
       btnContinue = 'Perbaikan';
@@ -652,7 +663,6 @@ class _worksheetStopState extends State<worksheetStop> {
         // print("data['btnnameeeee]");
         // print(data['btnname']);
         // btnContinue = data['btnname'];
-
       } else {}
     }
 
@@ -688,313 +698,519 @@ class _worksheetStopState extends State<worksheetStop> {
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         body: SafeArea(
           child: Center(
-            child: Column(
-              // mainAxisAlignment: MainAxisAlignment.center,
+            child: SingleChildScrollView(
+              child: Column(
+                // mainAxisAlignment: MainAxisAlignment.center,
 
-              children: [
-                SizedBox(
-                  height: MySize.getScaledSizeHeight(150),
-                ),
-                Image(
-                  width: MySize.getScaledSizeWidth(65),
-                  height: MySize.getScaledSizeHeight(65), //160
-                  image: AssetImage('assets/images/no.png'),
-                ),
-                SizedBox(
-                  height: MySize.getScaledSizeHeight(11),
-                ),
-                const Text(
-                  "Proses Dihentikan",
-                  style: TextStyle(
-                      fontFamily: "Helvetica",
-                      color: Color(0xFF9e9e9e),
-                      fontWeight: FontWeight.w500,
-                      fontSize: 18),
-                ),
-                SizedBox(
-                  height: MySize.getScaledSizeHeight(100),
-                ),
-                // IconButton(
-                //   onPressed: () {},
-                //   iconSize: 50,
-                //   icon: Icon(
-                //     Icons.help,
-                //     color: Colors.black45,
-                //   ),
-                // ),
+                children: [
+                  SizedBox(
+                    height: MySize.getScaledSizeHeight(150),
+                  ),
+                  Image(
+                    width: MySize.getScaledSizeWidth(65),
+                    height: MySize.getScaledSizeHeight(65), //160
+                    image: AssetImage('assets/images/no.png'),
+                  ),
+                  SizedBox(
+                    height: MySize.getScaledSizeHeight(11),
+                  ),
+                  const Text(
+                    "Proses Dihentikan",
+                    style: TextStyle(
+                        fontFamily: "Helvetica",
+                        color: Color(0xFF9e9e9e),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 18),
+                  ),
+                  SizedBox(
+                    height: MySize.getScaledSizeHeight(100),
+                  ),
+                  // IconButton(
+                  //   onPressed: () {},
+                  //   iconSize: 50,
+                  //   icon: Icon(
+                  //     Icons.help,
+                  //     color: Colors.black45,
+                  //   ),
+                  // ),
 
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
-                    minimumSize: Size(259, 63),
-                    padding: EdgeInsets.only(left: 43, right: 43),
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                          color: AppTheme.warnaHijau,
-                          width: 1.0,
-                          style: BorderStyle.solid),
-                      borderRadius: BorderRadius.all(Radius.circular(72.5)),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      minimumSize: Size(259, 63),
+                      padding: EdgeInsets.only(left: 43, right: 43),
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                            color: AppTheme.warnaHijau,
+                            width: 1.0,
+                            style: BorderStyle.solid),
+                        borderRadius: BorderRadius.all(Radius.circular(72.5)),
+                      ),
                     ),
+                    onPressed: () async {
+                      // saveWorksheet(values, Task);
+                      //cek status btnname
+                      await btnAction(
+                          widget.Task['id'].toString(), pauseCek, false);
+                      DefaultTabController.of(context).animateTo(0);
+                    },
+                    child: Text("Lanjut $btnContinue",
+                        style: AppTheme.OpenSans600LS(
+                            16, AppTheme.warnaHijau, -0.41)),
                   ),
-                  onPressed: () async {
-                    // saveWorksheet(values, Task);
-                    //cek status btnname
-                    await btnAction(
-                        widget.Task['id'].toString(), pauseCek, false);
-                    DefaultTabController.of(context)!.animateTo(0);
-                  },
-                  child: Text("Lanjut $btnContinue",
-                      style: AppTheme.OpenSans600LS(
-                          16, AppTheme.warnaHijau, -0.41)),
-                ),
-                SizedBox(
-                  height: MySize.getScaledSizeHeight(16),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: checkMandatory ? AppTheme.warnaHijau : Colors.grey,
-                    minimumSize: Size(259, 63),
-                    padding: EdgeInsets.only(left: 43, right: 43),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(72.5)),
+                  SizedBox(
+                    height: MySize.getScaledSizeHeight(16),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          checkMandatory ? AppTheme.warnaHijau : Colors.grey,
+                      minimumSize: Size(259, 63),
+                      padding: EdgeInsets.only(left: 43, right: 43),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(72.5)),
+                      ),
                     ),
-                  ),
-                  onPressed: () async {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        return WillPopScope(
-                          onWillPop: () async {
-                            return false;
-                          },
-                          child: Center(
-                            child: Container(
-                              width: 300 * MySize.scaleFactorWidth,
-                              height: 200 * MySize.scaleFactorHeight,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8))),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircularProgressIndicator(
-                                    // backgroundColor: Colors.transparent,
-                                    color: AppTheme.warnaHijau,
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text(
-                                    "Loading...",
-                                    style: TextStyle(
-                                        color: AppTheme.warnaHijau,
-                                        fontSize: 20),
-                                  )
-                                ],
+                    onPressed: () async {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return WillPopScope(
+                            onWillPop: () async {
+                              return false;
+                            },
+                            child: Center(
+                              child: Container(
+                                width: 300 * MySize.scaleFactorWidth,
+                                height: 200 * MySize.scaleFactorHeight,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.rectangle,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CircularProgressIndicator(
+                                      // backgroundColor: Colors.transparent,
+                                      color: AppTheme.warnaHijau,
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      "Loading...",
+                                      style: TextStyle(
+                                          color: AppTheme.warnaHijau,
+                                          fontSize: 20),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    );
-                    //lakukan aksi
-                    bool dataUpload = false;
-                    bool sendData = false;
-                    bool result = false;
-                    final boxdata = boxData(nameBox: "box_listUploadWorksheet");
-                    Network cekKoneksi =
-                        await objCekConnection.CheckConnection();
-                    // _checkMandatoryField();
-                    if (btnNext == 'Perbaikan' && checkMandatory) {
-                      print("save checking");
-//di disable 08022022
-                      // box_workSheetSetting(
-                      //     taskid: widget.Task["id"].toString(),
-                      //     tabbar: 1,
-                      //     btnname: "Fixing",
-                      //     page2: 2,
-                      //     pause: "aktif");
-//close tag
-//cek data di list, klo ada tunggu kosong, klo ga ada loading ilang
+                          );
+                        },
+                      );
+                      //lakukan aksi
+                      bool dataUpload = false;
+                      bool sendData = false;
+                      bool result = false;
+                      final boxdata =
+                          boxData(nameBox: "box_listUploadWorksheet");
+                      Network cekKoneksi =
+                          await objCekConnection.CheckConnection();
+                      // _checkMandatoryField();
+                      if (btnNext == 'Perbaikan' && checkMandatory) {
+                        print("save checking");
+                        //di disable 08022022
+                        // box_workSheetSetting(
+                        //     taskid: widget.Task["id"].toString(),
+                        //     tabbar: 1,
+                        //     btnname: "Fixing",
+                        //     page2: 2,
+                        //     pause: "aktif");
+                        //close tag
+                        //cek data di list, klo ada tunggu kosong, klo ga ada loading ilang
 
-                      if (cekKoneksi.Status) {
-                        sendWrksht = Timer.periodic(
-                            Duration(milliseconds: 1800), (Timer t) async {
-                          Network cekKoneksiloop =
-                              await objCekConnection.CheckConnection();
-                          if (cekKoneksiloop.Status) {
-                            dataUpload = await boxdata.cekDataOnListUpload(
-                                widget.Task['id'].toString());
-                            print("dataupload");
-                            print(dataUpload);
-                            if (dataUpload && !sendData) {
-                              sendData = true;
-                              //TODO Timeout
-
-                              //TODO fungsi untuk auto close popup jika popup nge freeze
-                              // bool autoClose = false;
-                              // Future.delayed(new Duration(seconds: 7),
-                              //     () async {
-                              //   if (!autoClose) {
-                              //     print("autoclose is active");
-                              //
-                              //     final boxdata = boxData(
-                              //         nameBox: "box_setLoginCredential");
-                              //
-                              //     String userId = await boxdata
-                              //         .getLoginCredential(param: "userId");
-                              //     final box_OpenDataUpload = await Hive.openBox(
-                              //         "box_listUploadWorksheet");
-                              //     final box_AddnDataUpload =
-                              //         Hive.box("box_listUploadWorksheet");
-                              //
-                              //     bool checkdata = false;
-                              //     List deleteData = [];
-                              //     if (box_OpenDataUpload.isNotEmpty) {
-                              //       if (userId != null) {
-                              //         final data = List.from(
-                              //             box_OpenDataUpload.get(userId) ?? []);
-                              //         if (data.isNotEmpty) {
-                              //           for (var val in data) {
-                              //             val['upload'] = 0;
-                              //             if (val['taskid'] ==
-                              //                 widget.Task['id'].toString()) {
-                              //               deleteData.add(val);
-                              //               print(val);
-                              //             }
-                              //           }
-                              //           for (var val in deleteData) {
-                              //             data.remove(val);
-                              //           }
-                              //           box_AddnDataUpload.delete(userId);
-                              //           box_AddnDataUpload.put(userId, data);
-                              //
-                              //           print(data);
-                              //         }
-                              //       }
-                              //       sendData = false;
-                              //     }
-                              //   } else {
-                              //     print("autoclose is not active");
-                              //   }
-                              // });
-
-                              //close tag
-                              //                              //
-                              result = await saveWorksheet(widget.Task, "1");
-                              if (!result) {
-                                sendData = false;
-
-                                ///close popup if failed send data to server
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              "gagal mengirim data ke server")));
-                                  Navigator.of(context).pop();
-                                }
-
-                                ///
-                              } else {
-                                // autoClose = true;
-                                if (mounted) {
-                                  Navigator.of(context).pop();
-                                }
-                                DefaultTabController.of(context)!.animateTo(0);
-                                sendWrksht!.cancel();
-                              }
-                            }
-                          } else {
-                            //add 25072022 part 2 saat timesheet fix
-                            if (!sendData) {
-                              sendData = true;
-
-                              result = await saveWorksheet(widget.Task, "1");
-                            }
-                            //closetag
-                            if (!result) {
-                              final downMessage = PopupError();
-
-                              if (mounted) {
-                                downMessage.showError(
-                                    context, cekKoneksi, false, mounted);
-                                Navigator.of(context).pop();
-                              }
-                              DefaultTabController.of(context)!.animateTo(0);
-
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  content: Text(
-                                      " anda tidak terhubung ke jaringan internet,data tersimpan di memori device")));
-                              sendWrksht!.cancel();
-                            }
-                          }
-                        });
-
-                        //TODO timeout
-
-                        //
-                      } else {
-                        await saveWorksheet(widget.Task, "1");
-                        final downMessage = PopupError();
-
-                        if (mounted) {
-                          downMessage.showError(
-                              context, cekKoneksi, false, mounted);
-                          Navigator.of(context).pop();
-                        }
-                        DefaultTabController.of(context)!.animateTo(0);
-                      }
-
-                      // calculateTimer(page2.toString());
-                    } else {
-                      //TODO btnnext kirim
-                      if (checkMandatory) {
                         if (cekKoneksi.Status) {
                           sendWrksht = Timer.periodic(
-                              Duration(milliseconds: 1300), (Timer t) async {
+                              Duration(milliseconds: 1800), (Timer t) async {
                             Network cekKoneksiloop =
                                 await objCekConnection.CheckConnection();
                             if (cekKoneksiloop.Status) {
                               dataUpload = await boxdata.cekDataOnListUpload(
                                   widget.Task['id'].toString());
-                              print("datauploadcek di button save kirim");
+                              print("dataupload");
                               print(dataUpload);
                               if (dataUpload && !sendData) {
-                                print("save fixing");
                                 sendData = true;
-                                // //TODO Timeout
-                                //
-                                // //TODO fungsi untuk auto close popup jika popup nge freeze
+                                //TODO Timeout
+
+                                //TODO fungsi untuk auto close popup jika popup nge freeze
                                 // bool autoClose = false;
-                                // Future.delayed(new Duration(seconds: 10),
+                                // Future.delayed(new Duration(seconds: 7),
                                 //     () async {
                                 //   if (!autoClose) {
                                 //     print("autoclose is active");
-                                //     if (mounted) {
-                                //       ScaffoldMessenger.of(context)
-                                //           .showSnackBar(SnackBar(
-                                //               content: Text(
-                                //                   "send data gagal harap coba lagi")));
-                                //       Navigator.of(context).pop();
+                                //
+                                //     final boxdata = boxData(
+                                //         nameBox: "box_setLoginCredential");
+                                //
+                                //     String userId = await boxdata
+                                //         .getLoginCredential(param: "userId");
+                                //     final box_OpenDataUpload = await Hive.openBox(
+                                //         "box_listUploadWorksheet");
+                                //     final box_AddnDataUpload =
+                                //         Hive.box("box_listUploadWorksheet");
+                                //
+                                //     bool checkdata = false;
+                                //     List deleteData = [];
+                                //     if (box_OpenDataUpload.isNotEmpty) {
+                                //       if (userId != null) {
+                                //         final data = List.from(
+                                //             box_OpenDataUpload.get(userId) ?? []);
+                                //         if (data.isNotEmpty) {
+                                //           for (var val in data) {
+                                //             val['upload'] = 0;
+                                //             if (val['taskid'] ==
+                                //                 widget.Task['id'].toString()) {
+                                //               deleteData.add(val);
+                                //               print(val);
+                                //             }
+                                //           }
+                                //           for (var val in deleteData) {
+                                //             data.remove(val);
+                                //           }
+                                //           box_AddnDataUpload.delete(userId);
+                                //           box_AddnDataUpload.put(userId, data);
+                                //
+                                //           print(data);
+                                //         }
+                                //       }
+                                //       sendData = false;
                                 //     }
-                                //     sendWrksht!.cancel();
-                                //     sendData = false;
                                 //   } else {
                                 //     print("autoclose is not active");
                                 //   }
                                 // });
 
-                                // close tag
-                                result = await saveWorksheet(widget.Task, "3");
+                                //close tag
+                                //                              //
+                                result = await saveWorksheet(widget.Task, "1");
+                                if (!result) {
+                                  sendData = false;
 
+                                  ///close popup if failed send data to server
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                "gagal mengirim data ke server")));
+                                    Navigator.of(context).pop();
+                                  }
+
+                                  ///
+                                } else {
+                                  // autoClose = true;
+                                  if (mounted) {
+                                    Navigator.of(context).pop();
+                                  }
+                                  DefaultTabController.of(context).animateTo(0);
+                                  sendWrksht!.cancel();
+                                }
+                              }
+                            } else {
+                              //add 25072022 part 2 saat timesheet fix
+                              if (!sendData) {
+                                sendData = true;
+
+                                result = await saveWorksheet(widget.Task, "1");
+                              }
+                              //closetag
+                              if (!result) {
+                                final downMessage = PopupError();
+
+                                if (mounted) {
+                                  downMessage.showError(
+                                      context, cekKoneksi, false, mounted);
+                                  Navigator.of(context).pop();
+                                }
+                                DefaultTabController.of(context).animateTo(0);
+
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: Text(
+                                        " anda tidak terhubung ke jaringan internet,data tersimpan di memori device")));
+                                sendWrksht!.cancel();
+                              }
+                            }
+                          });
+
+                          //TODO timeout
+
+                          //
+                        } else {
+                          await saveWorksheet(widget.Task, "1");
+                          final downMessage = PopupError();
+
+                          if (mounted) {
+                            downMessage.showError(
+                                context, cekKoneksi, false, mounted);
+                            Navigator.of(context).pop();
+                          }
+                          DefaultTabController.of(context).animateTo(0);
+                        }
+
+                        // calculateTimer(page2.toString());
+                      } else {
+                        //TODO btnnext kirim
+                        if (checkMandatory) {
+                          if (cekKoneksi.Status) {
+                            sendWrksht = Timer.periodic(
+                                Duration(milliseconds: 1300), (Timer t) async {
+                              Network cekKoneksiloop =
+                                  await objCekConnection.CheckConnection();
+                              if (cekKoneksiloop.Status) {
+                                dataUpload = await boxdata.cekDataOnListUpload(
+                                    widget.Task['id'].toString());
+                                print("datauploadcek di button save kirim");
+                                print(dataUpload);
+                                if (dataUpload && !sendData) {
+                                  print("save fixing");
+                                  sendData = true;
+                                  // //TODO Timeout
+                                  //
+                                  // //TODO fungsi untuk auto close popup jika popup nge freeze
+                                  // bool autoClose = false;
+                                  // Future.delayed(new Duration(seconds: 10),
+                                  //     () async {
+                                  //   if (!autoClose) {
+                                  //     print("autoclose is active");
+                                  //     if (mounted) {
+                                  //       ScaffoldMessenger.of(context)
+                                  //           .showSnackBar(SnackBar(
+                                  //               content: Text(
+                                  //                   "send data gagal harap coba lagi")));
+                                  //       Navigator.of(context).pop();
+                                  //     }
+                                  //     sendWrksht!.cancel();
+                                  //     sendData = false;
+                                  //   } else {
+                                  //     print("autoclose is not active");
+                                  //   }
+                                  // });
+
+                                  // close tag
+                                  result =
+                                      await saveWorksheet(widget.Task, "3");
+
+                                  if (!result) {
+                                    sendData = false;
+
+                                    ///close popup if failed send data to server
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  "gagal mengirim data ke server, harap mencoba kembali dan pastikan anda memiliki jaringan internet")));
+                                      Navigator.of(context).pop();
+                                    }
+
+                                    ///
+                                  } else {
+                                    final snackBarSuccess = SnackBar(
+                                      content: Text('Berhasil mengirim data ke server'),
+                                      backgroundColor: AppTheme.warnaHijau,
+                                            behavior: SnackBarBehavior.floating,
+                                    );
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(snackBarSuccess);
+                                    sendWrksht!.cancel();
+
+                                    await Navigator.of(context)
+                                        .pushAndRemoveUntil(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  HomeScreen(0),
+                                            ),
+                                            (route) => false);
+                                  }
+                                  // Navigator.pop(context);
+                                }
+                              } else {
+                                if (!result) {
+                                  final downMessage = PopupError();
+
+                                  if (mounted) {
+                                    downMessage.showError(
+                                        context, cekKoneksi, false, mounted);
+                                    Navigator.of(context).pop();
+                                  }
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              " Pastikan anda memiliki jaringan internet pada tahap kirim data")));
+                                  //
+                                  sendWrksht!.cancel();
+                                }
+                              }
+                            });
+                          } else {
+                            final downMessage = PopupError();
+
+                            // await saveWorksheet(widget.Task, "3");
+                            if (mounted) {
+                              downMessage.showError(
+                                  context, cekKoneksi, false, mounted);
+                              Navigator.of(context).pop();
+                            }
+
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  "Anda sedang offline, tidak dapat mengirimkan data."),
+                              backgroundColor: Colors.red,
+                            ));
+                            // Navigator.of(context).pop();
+                            // await ubahStatusTask(
+                            //     widget.Task['id'].toString(), "Pending Upload");
+                          }
+                        } else {
+                          // await saveWorksheet(widget.Task, "3");// edited 20072022
+                          if (mounted) {
+                            Navigator.of(context).pop();
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  "Lengkapi data yang bertanda bintang (*) pada form LPU")));
+                        }
+                      }
+                      await btnAction(
+                          widget.Task['id'].toString(), pauseCek, false);
+                    },
+                    child: Text("Lanjut $btnNext",
+                        style: AppTheme.OpenSans600LS(16, Colors.white, -0.41)),
+                  ),
+                  SizedBox(
+                    height: MySize.getScaledSizeHeight(16),
+                  ),
+
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      minimumSize: const Size(259, 63),
+                      padding: const EdgeInsets.only(left: 43, right: 43),
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                            color: AppTheme.warnaDongker,
+                            width: 1.0,
+                            style: BorderStyle.solid),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(72.5)),
+                      ),
+                    ),
+                    onPressed: () async {
+                      final notifApi = NotificationApi();
+                      await notifApi
+                          .drainStream('from page task_worksheet handoff');
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return WillPopScope(
+                            onWillPop: () async {
+                              return false;
+                            },
+                            child: Center(
+                              child: Container(
+                                width: 300 * MySize.scaleFactorWidth,
+                                height: 200 * MySize.scaleFactorHeight,
+                                decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.rectangle,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    CircularProgressIndicator(
+                                      // backgroundColor: Colors.transparent,
+                                      color: AppTheme.warnaHijau,
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      "Loading...",
+                                      style: TextStyle(
+                                          color: AppTheme.warnaHijau,
+                                          fontSize: 20),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+
+                      Network cekKoneksi =
+                          await objCekConnection.CheckConnection();
+                      if (cekKoneksi.Status) {
+                        var listUploadWorksheet =
+                            await Hive.openBox("box_listUploadWorksheet");
+                        bool sendData = false;
+                        bool dataUpload = false;
+                        bool result = false;
+
+                        final boxdata =
+                            boxData(nameBox: "box_listUploadWorksheet");
+                        handOff = Timer.periodic(Duration(milliseconds: 1800),
+                            (Timer t) async {
+                          Network cekKoneksiloop =
+                              await objCekConnection.CheckConnection();
+                          if (cekKoneksiloop.Status) {
+                            dataUpload = await boxdata.cekDataOnListUpload(
+                                widget.Task['id'].toString());
+                            // print("dataupload di serahterima kerjaan");
+                            print(dataUpload);
+                            if (dataUpload && !sendData) {
+                              var updateDasboard =
+                                  boxData(nameBox: 'box_dashboard');
+                              print("pauseCek dari serahterima page");
+                              print(pauseCek);
+                              await btnAction(
+                                  widget.Task['id'].toString(), pauseCek, true);
+                              // //TODO Timeout
+                              //
+                              // //TODO fungsi untuk auto close popup jika popup nge freeze
+                              // bool autoClose = false;
+                              // Future.delayed(new Duration(seconds: 10), () async {
+                              //   if (!autoClose) {
+                              //     print("autoclose is active");
+                              //     if (mounted) {
+                              //       ScaffoldMessenger.of(context).showSnackBar(
+                              //           SnackBar(
+                              //               content: Text(
+                              //                   "send data gagal harap coba lagi")));
+                              //       Navigator.of(context).pop();
+                              //     }
+                              //     handOff!.cancel();
+                              //     sendData = false;
+                              //   } else {
+                              //     print("autoclose is not active");
+                              //   }
+                              // });
+
+                              // close tag
+
+                              if (btnContinue == "Pengecekan") {
+                                sendData = true;
+                                result = await handedOff(widget.Task, "1");
                                 if (!result) {
                                   sendData = false;
 
@@ -1010,10 +1226,34 @@ class _worksheetStopState extends State<worksheetStop> {
                                   ///
                                 } else {
                                   // autoClose = true;
-                                  print("sendData");
-                                  print(sendData);
-                                  sendWrksht!.cancel();
+                                }
+                              } else {
+                                sendData = true;
+                                result = await handedOff(widget.Task, "2");
+                                if (!result) {
+                                  sendData = false;
 
+                                  ///close popup if failed send data to server
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                "gagal mengirim data ke server, harap mencoba kembali dan pastikan anda memiliki jaringan internet")));
+                                    Navigator.of(context).pop();
+                                  }
+
+                                  ///
+                                } else {
+                                  // autoClose = true;
+                                }
+                              }
+
+                              // Navigator.of(context).pop();
+                              if (result) {
+                                // autoClose = true;
+                                handOff!.cancel();
+
+                                if (mounted) {
                                   await Navigator.of(context)
                                       .pushAndRemoveUntil(
                                           MaterialPageRoute(
@@ -1021,260 +1261,44 @@ class _worksheetStopState extends State<worksheetStop> {
                                           ),
                                           (route) => false);
                                 }
-                                // Navigator.pop(context);
-                              }
-                            } else {
-                              if (!result) {
-                                final downMessage = PopupError();
-
-                                if (mounted) {
-                                  downMessage.showError(
-                                      context, cekKoneksi, false, mounted);
-                                  Navigator.of(context).pop();
-                                }
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            " Pastikan anda memiliki jaringan internet pada tahap kirim data")));
-                                //
-                                sendWrksht!.cancel();
                               }
                             }
-                          });
-                        } else {
-                          final downMessage = PopupError();
+                          } else {
+                            if (!result) {
+                              final downMessage = PopupError();
+                              if (mounted) {
+                                downMessage.showError(
+                                    context, cekKoneksi, true, mounted);
+                                // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                //     content: Text(
+                                //         "anda tidak terhubung ke jaringan internet")));
+                                Navigator.of(context).pop();
+                              }
 
-                          // await saveWorksheet(widget.Task, "3");
-                          if (mounted) {
-                            downMessage.showError(
-                                context, cekKoneksi, false, mounted);
-                            Navigator.of(context).pop();
+                              handOff!.cancel();
+                            }
                           }
-
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(
-                                  " harap mengaktifkan jaringan internet anda pada tahap kirim data")));
-                          // Navigator.of(context).pop();
-                          // await ubahStatusTask(
-                          //     widget.Task['id'].toString(), "Pending Upload");
-                        }
+                        });
                       } else {
-                        // await saveWorksheet(widget.Task, "3");// edited 20072022
+                        final downMessage = PopupError();
+
                         if (mounted) {
                           Navigator.of(context).pop();
+                          downMessage.showError(
+                              context, cekKoneksi, true, mounted);
+                          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          //     content: Text(
+                          //         "anda tidak terhubung ke jaringan internet")));
                         }
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(
-                                "lengkapi data yang bertanda bintang (*) pada form LPU")));
                       }
-                    }
-                    await btnAction(
-                        widget.Task['id'].toString(), pauseCek, false);
-                  },
-                  child: Text("Lanjut $btnNext",
-                      style: AppTheme.OpenSans600LS(16, Colors.white, -0.41)),
-                ),
-                SizedBox(
-                  height: MySize.getScaledSizeHeight(16),
-                ),
-
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
-                    minimumSize: const Size(259, 63),
-                    padding: const EdgeInsets.only(left: 43, right: 43),
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                          color: AppTheme.warnaDongker,
-                          width: 1.0,
-                          style: BorderStyle.solid),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(72.5)),
-                    ),
+                    },
+                    child: Text("Serahkan ke orang lain",
+                        style: AppTheme.OpenSans600LS(
+                            16, AppTheme.warnaDongker, -0.41)),
                   ),
-                  onPressed: () async {
-                    final notifApi = NotificationApi();
-                    await notifApi
-                        .drainStream('from page task_worksheet handoff');
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        return WillPopScope(
-                          onWillPop: () async {
-                            return false;
-                          },
-                          child: Center(
-                            child: Container(
-                              width: 300 * MySize.scaleFactorWidth,
-                              height: 200 * MySize.scaleFactorHeight,
-                              decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8))),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircularProgressIndicator(
-                                    // backgroundColor: Colors.transparent,
-                                    color: AppTheme.warnaHijau,
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text(
-                                    "Loading...",
-                                    style: TextStyle(
-                                        color: AppTheme.warnaHijau,
-                                        fontSize: 20),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-
-                    Network cekKoneksi =
-                        await objCekConnection.CheckConnection();
-                    if (cekKoneksi.Status) {
-                      var listUploadWorksheet =
-                          await Hive.openBox("box_listUploadWorksheet");
-                      bool sendData = false;
-                      bool dataUpload = false;
-                      bool result = false;
-
-                      final boxdata =
-                          boxData(nameBox: "box_listUploadWorksheet");
-                      handOff = Timer.periodic(Duration(milliseconds: 1800),
-                          (Timer t) async {
-                        Network cekKoneksiloop =
-                            await objCekConnection.CheckConnection();
-                        if (cekKoneksiloop.Status) {
-                          dataUpload = await boxdata.cekDataOnListUpload(
-                              widget.Task['id'].toString());
-                          // print("dataupload di serahterima kerjaan");
-                          print(dataUpload);
-                          if (dataUpload && !sendData) {
-                            var updateDasboard =
-                                boxData(nameBox: 'box_dashboard');
-                            print("pauseCek dari serahterima page");
-                            print(pauseCek);
-                            await btnAction(
-                                widget.Task['id'].toString(), pauseCek, true);
-                            // //TODO Timeout
-                            //
-                            // //TODO fungsi untuk auto close popup jika popup nge freeze
-                            // bool autoClose = false;
-                            // Future.delayed(new Duration(seconds: 10), () async {
-                            //   if (!autoClose) {
-                            //     print("autoclose is active");
-                            //     if (mounted) {
-                            //       ScaffoldMessenger.of(context).showSnackBar(
-                            //           SnackBar(
-                            //               content: Text(
-                            //                   "send data gagal harap coba lagi")));
-                            //       Navigator.of(context).pop();
-                            //     }
-                            //     handOff!.cancel();
-                            //     sendData = false;
-                            //   } else {
-                            //     print("autoclose is not active");
-                            //   }
-                            // });
-
-                            // close tag
-
-                            if (btnContinue == "Pengecekan") {
-                              sendData = true;
-                              result = await handedOff(widget.Task, "1");
-                              if (!result) {
-                                sendData = false;
-
-                                ///close popup if failed send data to server
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              "gagal mengirim data ke server, harap mencoba kembali dan pastikan anda memiliki jaringan internet")));
-                                  Navigator.of(context).pop();
-                                }
-
-                                ///
-                              } else {
-                                // autoClose = true;
-                              }
-                            } else {
-                              sendData = true;
-                              result = await handedOff(widget.Task, "2");
-                              if (!result) {
-                                sendData = false;
-
-                                ///close popup if failed send data to server
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              "gagal mengirim data ke server, harap mencoba kembali dan pastikan anda memiliki jaringan internet")));
-                                  Navigator.of(context).pop();
-                                }
-
-                                ///
-                              } else {
-                                // autoClose = true;
-                              }
-                            }
-
-                            // Navigator.of(context).pop();
-                            if (result) {
-                              // autoClose = true;
-                              handOff!.cancel();
-
-                              if (mounted) {
-                                await Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                      builder: (context) => HomeScreen(0),
-                                    ),
-                                    (route) => false);
-                              }
-                            }
-                          }
-                        } else {
-                          if (!result) {
-                            final downMessage = PopupError();
-                            if (mounted) {
-                              downMessage.showError(
-                                  context, cekKoneksi, true, mounted);
-                              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              //     content: Text(
-                              //         "anda tidak terhubung ke jaringan internet")));
-                              Navigator.of(context).pop();
-                            }
-
-                            handOff!.cancel();
-                          }
-                        }
-                      });
-                    } else {
-                      final downMessage = PopupError();
-
-                      if (mounted) {
-                        Navigator.of(context).pop();
-                        downMessage.showError(
-                            context, cekKoneksi, true, mounted);
-                        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        //     content: Text(
-                        //         "anda tidak terhubung ke jaringan internet")));
-                      }
-                    }
-                  },
-                  child: Text("Serahkan ke orang lain",
-                      style: AppTheme.OpenSans600LS(
-                          16, AppTheme.warnaDongker, -0.41)),
-                ),
-              ],
+                  // Text(stress),
+                ],
+              ),
             ),
           ),
         ),
@@ -1302,8 +1326,7 @@ btnAction(String taskid, String pauseCek, bool handedoff) async {
 
   data =
       await objBox.getValueSettingFormWorksheet(userid: userid, taskid: taskid);
-  print("data commonsetting di db lokal");
-  print(data);
+  print('datanyaaa ${data}');
   if (data != null) {
     if (data['pause'] != null && data['pause'] != "") {
       pauseCek = data['pause'];
@@ -1312,12 +1335,10 @@ btnAction(String taskid, String pauseCek, bool handedoff) async {
       if (data['btnname'] == "Fixing" || data['btnname'] == "Kirim") {
         page2 = 2;
       }
-      print("data with $taskid is not empty line 428");
       print(data);
     }
   }
 
-  print(pauseCek);
   if (!handedoff) {
   } else {
     //handedoff
@@ -1414,10 +1435,11 @@ class TaskWorksheet extends StatefulWidget {
   String dataStsWrkShtServer;
   // dynamic Tabbar
   TaskWorksheet(
-      this.Task, this.objDataTask, this.statusTask, this.dataStsWrkShtServer);
+      this.Task, this.objDataTask, this.statusTask, this.dataStsWrkShtServer,
+      {super.key});
 
   @override
-  State<TaskWorksheet> createState() => _TaskWorksheetState(this.Task);
+  State<TaskWorksheet> createState() => _TaskWorksheetState(Task);
 }
 
 class _TaskWorksheetState extends State<TaskWorksheet> {
@@ -1457,7 +1479,7 @@ class _TaskWorksheetState extends State<TaskWorksheet> {
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
       child: Scaffold(
         body: SafeArea(
             child: Column(
@@ -1480,7 +1502,7 @@ class _TaskWorksheetState extends State<TaskWorksheet> {
             //   child: Center(
             //     child: ElevatedButton(
             //       style: ElevatedButton.styleFrom(
-            //         primary: AppTheme.warnaHijau,
+            //         backgroundColor:  AppTheme.warnaHijau,
             //         minimumSize: Size(289, 63),
             //         padding: EdgeInsets.only(left: 43, right: 43),
             //         shape: const RoundedRectangleBorder(
@@ -1513,14 +1535,8 @@ Future<bool> saveWorksheet(dynamic Task, String Status) async {
   String userID = await boxdata.getLoginCredential(param: "userId");
 
   var WorksheetForm = await Hive.openBox("box_valworksheet");
-
+  // return WorksheetForm.get(userID);
   if (WorksheetForm.isNotEmpty) {
-    // for (var value in data) {
-    //   if (value['taskid'] == taskId.toString()) {
-    //     checkdata = false;
-    //   }
-    // }
-
     List dataFill = [WorksheetForm.get(userID)];
     Map<String, dynamic> indexedData = {};
     final objBox = boxData(nameBox: 'box_valworksheet');
@@ -1600,11 +1616,12 @@ class TaskWorksheeyWidget extends StatefulWidget {
   Map<String, dynamic> valuess = {};
   Function(Map<String, dynamic>) callback;
   TaskWorksheeyWidget(this.Task, this.objDataTask, this.statusTask,
-      this.callback, this.page1, this.page2);
+      this.callback, this.page1, this.page2,
+      {super.key});
   late dynamic objData;
   @override
-  State<TaskWorksheeyWidget> createState() => _TaskWorksheeyWidgetState(
-      this.Task, this.callback, this.page1, this.page2);
+  State<TaskWorksheeyWidget> createState() =>
+      _TaskWorksheeyWidgetState(Task, callback, page1, page2);
 }
 
 class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
@@ -1617,8 +1634,8 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
   Timer? timer;
 
   runTimer() async {
-    final addSeconds = 1;
-    final boxTimer_Temporary = boxData(nameBox: "box_TimerTemporary");
+    const addSeconds = 1;
+    final boxtimerTemporary = boxData(nameBox: "box_TimerTemporary");
 
     if (mounted) {
       setState(() {
@@ -1629,7 +1646,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
           duration.inMinutes.remainder(60),
           duration.inSeconds.remainder(60)
         ];
-        boxTimer_Temporary.savingTimer_temporary(
+        boxtimerTemporary.savingTimer_temporary(
             Taskid: widget.Task['id'].toString(), Timer: dataList);
       });
     }
@@ -1676,7 +1693,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
         ),
       ),
     );
-    DefaultTabController.of(context)!.animateTo(1);
+    DefaultTabController.of(context).animateTo(1);
     setState(() {});
   }
 
@@ -1698,9 +1715,9 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
 
   Future<void> saveTimer() async {
     print('save timer from dispose');
-    final boxTimer_Temporary = boxData(nameBox: "box_TimerTemporary");
-    final boxTimer_Worksheet = boxData(nameBox: "box_TimerWorksheet");
-    List getTimerTemporary = List.from(await boxTimer_Temporary
+    final boxtimerTemporary = boxData(nameBox: "box_TimerTemporary");
+    final boxtimerWorksheet = boxData(nameBox: "box_TimerWorksheet");
+    List getTimerTemporary = List.from(await boxtimerTemporary
             .getTimer_temporary(Taskid: Task['id'].toString()) ??
         []);
     if (getTimerTemporary.isNotEmpty) {
@@ -1712,24 +1729,24 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
       for (int i = 0; i < getTimerTemporary.length; i++) {
         saveTimer[formatTimer[i]] = getTimerTemporary[i];
       }
-      await boxTimer_Worksheet.saveTimer(saveTimer);
-      await boxTimer_Temporary.deleteTimer_temporary(
+      await boxtimerWorksheet.saveTimer(saveTimer);
+      await boxtimerTemporary.deleteTimer_temporary(
           Taskid: widget.Task['id'].toString());
     }
   }
 
   startTimer() async {
     //TODO initial trigger timer true,for active
-    final openTimer_Worksheet = boxData(nameBox: 'box_TimerWorksheet');
-    final getTimer_Worksheet = Map.from(
-        await openTimer_Worksheet.getTimer(widget.Task['id'].toString()));
+    final opentimerWorksheet = boxData(nameBox: 'box_TimerWorksheet');
+    final gettimerWorksheet = Map.from(
+        await opentimerWorksheet.getTimer(widget.Task['id'].toString()));
     print("getTimer_Worksheet");
-    print(getTimer_Worksheet);
-    if (getTimer_Worksheet.isNotEmpty) {
+    print(gettimerWorksheet);
+    if (gettimerWorksheet.isNotEmpty) {
       duration = Duration(
-          hours: getTimer_Worksheet['jam'],
-          minutes: getTimer_Worksheet['menit'],
-          seconds: getTimer_Worksheet['detik']);
+          hours: gettimerWorksheet['jam'],
+          minutes: gettimerWorksheet['menit'],
+          seconds: gettimerWorksheet['detik']);
     }
     //close tag
 
@@ -1751,21 +1768,21 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
   int page2 = 0;
   int _state = 0;
   // validasi field mandatory
-  GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   dynamic Task;
-  dynamic objData = null;
+  dynamic objData;
 
   File _image = File("");
-  String _conv = "";
+  final String _conv = "";
   File _imageSelect = File("");
   final _picker = ImagePicker();
   Timer? _debounce;
   Function(Map<String, dynamic>) callback;
   _TaskWorksheeyWidgetState(this.Task, this.callback, this.page1, this.page2);
 
-  dynamic dataValueBox = null;
-  dynamic dataFormPure = null;
+  dynamic dataValueBox;
+  dynamic dataFormPure;
   int countPartDiganti = 1;
   int tresholdPartDiganti = 6;
   @override
@@ -1968,7 +1985,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
       return Text("Terima",
           style: AppTheme.OpenSans600LS(16, AppTheme.warnaHijau, -0.41));
     } else if (_state == 1) {
-      Future.delayed(new Duration(seconds: 15), () async {
+      Future.delayed(Duration(seconds: 15), () async {
         Connection objCekConnection = Connection();
         Network cekKoneksi = await objCekConnection.CheckConnection();
         // print("Cek Koneksi isnternet di setupbuttonchild");
@@ -2026,7 +2043,8 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
       }
 
       return MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+        data:
+            MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
         child: Padding(
             padding: const EdgeInsets.fromLTRB(15, 8, 20, 8),
             child: (length != 0)
@@ -2058,8 +2076,8 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                             itemCount: length,
                             itemBuilder: (BuildContext context, int index) {
                               return MediaQuery(
-                                data: MediaQuery.of(context)
-                                    .copyWith(textScaleFactor: 1.0),
+                                data: MediaQuery.of(context).copyWith(
+                                    textScaler: TextScaler.linear(1.0)),
                                 child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -2086,7 +2104,9 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                                     btnName != "Kirim"
                                         ? (ElevatedButton(
                                             style: ElevatedButton.styleFrom(
-                                              primary: Colors.white70,
+                                              backgroundColor: !fillField
+                                                  ? AppTheme.warnaHijau
+                                                  : Colors.red,
                                               minimumSize: Size(89, 63),
                                               padding: const EdgeInsets.only(
                                                   left: 43, right: 43),
@@ -2123,12 +2143,12 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
 
                                                 //closetag
 
-                                                var validate_check = false;
-                                                validate_check =
+                                                var validateCheck = false;
+                                                validateCheck =
                                                     _checkMandatoryField(
                                                         dataValueBox, page2);
 
-                                                print(validate_check);
+                                                print(validateCheck);
                                                 print("validate");
 
                                                 //check validation dari button
@@ -2136,7 +2156,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                                                     _formKey.currentState;
 
                                                 if (form!.validate() &&
-                                                    validate_check &&
+                                                    validateCheck &&
                                                     duration.inSeconds > 0) {
                                                   box_workSheetSetting(
                                                       taskid: widget.Task["id"]
@@ -2174,13 +2194,13 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                                                     style:
                                                         AppTheme.OpenSans600LS(
                                                             16,
-                                                            AppTheme.warnaHijau,
+                                                            Colors.white,
                                                             -0.41))
                                                 : Text("Stop",
                                                     style:
                                                         AppTheme.OpenSans600LS(
                                                             16,
-                                                            Colors.red,
+                                                            Colors.white,
                                                             -0.41)),
                                           ))
                                         : (Container())
@@ -2197,7 +2217,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                                       children: [
                                         ElevatedButton(
                                             style: ElevatedButton.styleFrom(
-                                              primary: Colors.white70,
+                                              backgroundColor: Colors.white70,
                                               minimumSize: Size(89, 63),
                                               padding: const EdgeInsets.only(
                                                   left: 43, right: 43),
@@ -2264,17 +2284,17 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                                                           widget.Task));
 
                                                   //add task detail
-                                                  var box_AddDetail = Hive.box(
+                                                  var boxAdddetail = Hive.box(
                                                       "box_detailPekerjaan");
-                                                  await box_AddDetail.put(
+                                                  await boxAdddetail.put(
                                                     widget.Task['id']
                                                         .toString(),
                                                     widget.objDataTask,
                                                   );
                                                   // add form
-                                                  var box_addForm = Hive.box(
+                                                  var boxAddform = Hive.box(
                                                       "box_worksheetform");
-                                                  box_addForm.put(
+                                                  boxAddform.put(
                                                       widget.Task['id']
                                                           .toString(),
                                                       dataFormPure);
@@ -2430,7 +2450,6 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                                                 //kalo pekerjaan udah di ambil
 
                                                 //
-
                                               } else {}
                                             },
                                             child: setUpButtonChild()),
@@ -2464,43 +2483,33 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
       _image = image;
       _imageSelect = image;
       await _saveImageToDB(image, data.name);
-      setState(() {});
     }
-    // bool cekdata = false;
-    // String dir = (await getApplicationDocumentsDirectory()).path;
-    // File file = File("$dir/" + userid + taskid + data.text + ".png");
-    // cekdata = await file.exists();
-    // if (pickedFile != null) {
-    //   if (cekdata) {
-    //     file.delete();
-    //   }
-    // }
   }
 
   Future<void> _imgFromGallery(
       dynamic data, String userid, String taskid) async {
-    File image = File("");
-    final pickedFile =
-        await _picker.getImage(source: ImageSource.gallery, imageQuality: 20);
-    if (pickedFile != null) {
-      image = File(pickedFile.path);
-      _image = image;
-      _imageSelect = image;
-      valuess[data.name] = image;
-      await _saveImageToDB(image, data.name);
-      setState(() {});
+    try {
+      print("pick");
+      File image = File("");
+      final pickedFile =
+          await _picker.getImage(source: ImageSource.gallery, imageQuality: 20);
+      print(pickedFile);
+      if (pickedFile != null) {
+        print("dapat");
+        image = File(pickedFile.path);
+        _image = image;
+        _imageSelect = image;
+        valuess[data.name] = image;
+        await _saveImageToDB(image, data.name);
+        setState(() {});
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Tidak mendapatkan aksess file')));
+      }
+      print(image);
+    } catch (e) {
+      print("Error picking image: $e");
     }
-    // bool cekdata = false;
-    // String dir = (await getApplicationDocumentsDirectory()).path;
-    // File file = File("$dir/" + userid + taskid + data.text + ".png");
-    // cekdata = await file.exists();
-    // if (pickedFile != null) {
-    //   if (cekdata) {
-    //     file.delete();
-    //   }
-    // }
-
-    print(image);
   }
 
   //TODO: Mengubah file dari base64 ke file image
@@ -2513,19 +2522,20 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
         ),
         builder: (BuildContext bc) {
           return MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(1.0)),
             child: SafeArea(
               child: Container(
                 child: Wrap(
                   children: <Widget>[
-                    ListTile(
-                        leading: Icon(Icons.photo_library),
-                        title: Text('Photo Library',
-                            style: AppTheme.OpenSans400(14, Color(0xFF333333))),
-                        onTap: () {
-                          _imgFromGallery(data, userid, taskid);
-                          Navigator.of(context).pop();
-                        }),
+                    // ListTile(
+                    //     leading: Icon(Icons.photo_library),
+                    //     title: Text('Photo Library',
+                    //         style: AppTheme.OpenSans400(14, Color(0xFF333333))),
+                    //     onTap: () {
+                    //       _imgFromGallery(data, userid, taskid);
+                    //       Navigator.of(context).pop();
+                    //     }),
                     ListTile(
                       leading: Icon(Icons.photo_camera),
                       title: Text('Camera',
@@ -2563,25 +2573,17 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
   }
 
   _saveImageToDB(File image, key) async {
-    var bytes;
+    Uint8List bytes;
     String base64Encode = "";
     print("image view");
     print(image);
     if (image.path.toString() != "") {
-      print('ini dapet');
       bytes = image.readAsBytesSync();
       base64Encode = base64.encode(bytes);
       dataValueBox[key] = base64Encode;
     } else {
       dataValueBox[key] = "";
     }
-    print("keykey");
-    print(key);
-    print(dataValueBox[key]);
-    //delete
-    // else {
-    //   dataValueBox[key] = "";
-    // }
 
 //save to db lokal
     var objBox = boxData(nameBox: 'box_valworksheet');
@@ -2598,9 +2600,9 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
 
     if (entitlement is List<dynamic>) {
       List<Widget> tmpWidget = WorkSheetArray(entitlement);
-      tmpWidget.forEach((objData) {
+      for (var objData in tmpWidget) {
         lstWidget.add(objData);
-      });
+      }
     } else {
       if (entitlement.page == page1 || entitlement.page == page2) {
         if (entitlement.header == true) {
@@ -2754,6 +2756,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                           }
                           return null;
                         }
+                        return null;
                       },
                       enabled: fillField,
                       // untuk disable field
@@ -2948,6 +2951,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                           }
                           return null;
                         }
+                        return null;
                       },
                       enabled: fillField,
                       // untuk disable field
@@ -3062,7 +3066,8 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                 // index++;
               } else if (entitlement.input == "date") {
                 lstWidget.add(MediaQuery(
-                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                  data: MediaQuery.of(context)
+                      .copyWith(textScaler: TextScaler.linear(1.0)),
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: 2 * MySize.scaleFactorWidth,
@@ -3095,20 +3100,10 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                       //   return null;
                       // },
                       onTap: () {
-                        FocusScope.of(context).requestFocus(new FocusNode());
+                        FocusScope.of(context).requestFocus(FocusNode());
 
                         DatePicker.showDatePicker(context,
-                            showTitleActions: true,
-                            theme: DatePickerTheme(
-                              backgroundColor: Colors.white,
-                              itemStyle: TextStyle(fontSize: 12),
-                              cancelStyle: TextStyle(
-                                  fontSize: 15,
-                                  color: AppTheme.warnaHijau.withOpacity(1.0)),
-                              doneStyle: TextStyle(
-                                  fontSize: 15,
-                                  color: AppTheme.warnaHijau.withOpacity(1.0)),
-                            ), onChanged: (date) {
+                            showTitleActions: true, onChanged: (date) {
                           // dataArr[entitlement.text].text =
                           valuess[entitlement.name].text =
                               DateFormat('dd/MM/yyyy').format(date);
@@ -3165,7 +3160,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                     //   return null;
                     // },
                     onTap: () {
-                      FocusScope.of(context).requestFocus(new FocusNode());
+                      FocusScope.of(context).requestFocus(FocusNode());
                       // DatePicker.showDateTimePicker(context,
                       //     showTitleActions: true,
                       //     theme: DatePickerTheme(
@@ -3194,18 +3189,8 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                       // }, currentTime: DateTime.now(), locale: LocaleType.id);
 
                       // kalo viewnya mau tanggal aja dan waktunya waktu terkini, ini aktifkan
-                      DatePicker.showDatePicker(context,
-                          showTitleActions: true,
-                          theme: DatePickerTheme(
-                            backgroundColor: Colors.white,
-                            itemStyle: TextStyle(fontSize: 12),
-                            cancelStyle: TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF008199).withOpacity(1.0)),
-                            doneStyle: TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF008199).withOpacity(1.0)),
-                          ), onChanged: (date) {
+                      DatePicker.showDatePicker(context, showTitleActions: true,
+                          onChanged: (date) {
                         // dataArr[entitlement.text].text =
                         // valuess[entitlement.name].text =
                         //     DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
@@ -3719,7 +3704,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                                   : Colors.grey.withOpacity(0.2),
                               width: MySize.getScaledSizeWidth(1))),
                     ),
-                    child: Container(
+                    child: SizedBox(
                       height: MySize.getScaledSizeHeight(22),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
@@ -3733,8 +3718,8 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: MediaQuery(
-                                data: MediaQuery.of(context)
-                                    .copyWith(textScaleFactor: 1.0),
+                                data: MediaQuery.of(context).copyWith(
+                                    textScaler: TextScaler.linear(1.0)),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
@@ -3925,7 +3910,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
               {
                 // val.add("ada");
                 // String data = "";
-
+                print("entitleeee ${valuess[entitlement.name]}");
                 if (entitlement.relation == 'product.product') {
                   // if (countPartDiganti < tresholdPartDiganti) {
                   // print("countPartDiganti");
@@ -3957,7 +3942,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                               ) ??
                               [];
 
-                          if (data != null && data.isNotEmpty) {
+                          if (data.isNotEmpty) {
                             print('data product.product');
                             print(data);
                             valuess[entitlement.name] = data;
@@ -4065,8 +4050,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                             }
                           }
                           // use data
-                          print("garansi");
-                          print(garansi);
+                          print("garansiiii ${garansi}");
                           List<dynamic> data = [];
                           if (entitlement.relation == 'isd.warranty.term') {
                             data = await Navigator.push(
@@ -4087,7 +4071,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                           //     // entitlement.text ?? "pilih part yang diganti"
                           //   ),
                           // );
-                          if (data != null && data.isNotEmpty) {
+                          if (data.isNotEmpty) {
                             print('data garansi');
                             print(data);
                             valuess[entitlement.name] = data;
@@ -4117,6 +4101,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                               children: [
                                 Expanded(
                                   child: Container(
+                                    // ignore: prefer_const_constructors
                                     padding: EdgeInsets.only(
                                         left: 19.0,
                                         right: 10.0,
@@ -4171,9 +4156,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                                 Row(
                                   children: [
                                     Text(
-                                      entitlement.text != null
-                                          ? entitlement.text
-                                          : "",
+                                      entitlement.text ?? "",
                                       style: AppTheme.OpenSans700(
                                           15, Color(0xFF333333)),
                                     ),
@@ -4254,7 +4237,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
                 child: CheckboxListTile(
                   contentPadding: EdgeInsets.symmetric(horizontal: 0),
                   title: Text(
-                    entitlement.text != null ? entitlement.text : "",
+                    entitlement.text ?? "",
                     style: AppTheme.OpenSans700(15, Color(0xFF333333)),
                   ),
                   value: valuess[entitlement.name],

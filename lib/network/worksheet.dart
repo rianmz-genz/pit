@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart';
@@ -9,11 +8,10 @@ import 'package:pit/model/mNetwork.dart';
 import 'package:pit/helpers/odoo.dart';
 
 import '../utils/boxData.dart';
-import 'CheckDataConnection.dart';
 
 class WorksheetNetwork {
   // final String _Url = "https://testpit.odoo.com"; //staging
-  final String _Url = "https://pitelektronik.odoo.com"; //production
+  final String _Url = "http://103.195.30.141:8069"; //production
   String generateMd5(String input) {
     return md5.convert(utf8.encode(input)).toString();
   }
@@ -67,7 +65,7 @@ class WorksheetNetwork {
     // Connection objCekConnection = Connection();
     // Network cekKoneksi = await objCekConnection.CheckConnection();
     var dataBox = boxData(nameBox: "box_listUploadWorksheet");
-    print("Cek Koneksi saveworkshett line 80");
+    print("Cek Koneksi saveworkshett line 80 ${worksheet}");
     // print('hasilnya: $cekKoneksi');
     // if (cekKoneksi.Status) {
     dynamic objParam = {};
@@ -130,16 +128,17 @@ class WorksheetNetwork {
       }
     }
 
-    print('objParam line 125 dari file saveworksheet.dart');
-
-    print(objParam);
+    print('objParam line 125 dari file saveworksheet.dart ${objParam}');
+    objNetwork =
+        Network(Status: false, Message: json.encode(objParam).toString());
+    // print(objParam);
     var request = http.Request('POST', Uri.parse('$_Url/worksheet/save'));
     request.body = json.encode(objParam);
     request.headers.addAll(headers);
     //init box list upload
-    var box_AddlistUploadWorksheet = Hive.box("box_listUploadWorksheet");
+    var boxAddlistuploadworksheet = Hive.box("box_listUploadWorksheet");
 
-    var box_OpenlistUploadWorksheet =
+    var boxOpenlistuploadworksheet =
         await Hive.openBox("box_listUploadWorksheet");
     // if (!manualSave && Id != 0) {
     //   dataBox.replaceUploadListTask(
@@ -203,16 +202,16 @@ class WorksheetNetwork {
                   id: Id!, userId: userId.toString());
             }
             // ganti status task di ongoing ke history
-            var box_AddList = Hive.box("box_listPekerjaan");
+            var boxAddlist = Hive.box("box_listPekerjaan");
             //open box list pekerjaan
-            var box_openListPekerjaan = await Hive.openBox("box_listPekerjaan");
+            var boxOpenlistpekerjaan = await Hive.openBox("box_listPekerjaan");
 
             //
 
             //update data dashboard
             if (status == "3") {
               //changed
-              final data = box_openListPekerjaan.get(userId);
+              final data = boxOpenlistpekerjaan.get(userId);
               final updateList = boxData(nameBox: 'box_listPekerjaan');
 
               updateList.UpdateListTask(

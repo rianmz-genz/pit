@@ -1,6 +1,4 @@
-import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:pit/themes/AppTheme.dart';
@@ -95,15 +93,15 @@ class HelpCenter extends StatelessWidget {
     MySize().init(context);
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
           appBar: AppBar(
             backgroundColor: AppTheme.warnaUngu,
-            actions: [],
+            actions: const [],
             leading: IconButton(
               splashColor: AppTheme.warnaUngu,
               onPressed: () => Navigator.of(context).pop(),
-              icon: Icon(Icons.keyboard_arrow_left, size: 40),
+              icon: const Icon(Icons.keyboard_arrow_left, size: 40),
             ),
             automaticallyImplyLeading: true,
             centerTitle: true,

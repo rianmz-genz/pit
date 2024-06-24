@@ -7,7 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:pit/pages/task_list_adapter.dart';
 
 class TaskList extends StatefulWidget {
-  TaskList();
+  const TaskList({super.key});
 
   @override
   State<TaskList> createState() => _TaskListState();
@@ -23,7 +23,7 @@ class _TaskListState extends State<TaskList> {
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -31,7 +31,7 @@ class _TaskListState extends State<TaskList> {
           leading: IconButton(
             splashColor: AppTheme.warnaUngu,
             onPressed: () => Navigator.of(context).pop(),
-            icon: Icon(Icons.keyboard_arrow_left, size: 40),
+            icon: const Icon(Icons.keyboard_arrow_left, size: 40),
           ),
           centerTitle: true,
           title: Text(
@@ -40,7 +40,7 @@ class _TaskListState extends State<TaskList> {
             textAlign: TextAlign.center,
           ),
         ),
-        body: SafeArea(
+        body: const SafeArea(
           child: TaskListLocation(),
         ),
       ),
@@ -49,6 +49,8 @@ class _TaskListState extends State<TaskList> {
 }
 
 class TaskListLocation extends StatelessWidget {
+  const TaskListLocation({super.key});
+
   Future<dynamic> getLocationTask() async {
     /*
     loc.Location location = new loc.Location();
@@ -195,7 +197,7 @@ class TaskListLocation extends StatelessWidget {
           );
         }
 
-        return Center(
+        return const Center(
             child: CircularProgressIndicator(
           color: AppTheme.warnaHijau,
         ));

@@ -5,7 +5,7 @@ import 'package:path/path.dart' as path;
 
 class DbHelper {
   //membuat method singleton
-  static DbHelper _dbHelper = DbHelper._singleton();
+  static final DbHelper _dbHelper = DbHelper._singleton();
 
   factory DbHelper() {
     return _dbHelper;

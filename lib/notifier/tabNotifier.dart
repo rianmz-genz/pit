@@ -9,7 +9,7 @@ class TabNotifier extends ChangeNotifier {
   }
 
   init() async {
-    await getData(this.Task['id']);
+    await getData(Task['id']);
     print("provider init");
 
     notifyListeners();

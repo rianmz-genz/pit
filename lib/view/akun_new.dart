@@ -1,10 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pit/utils/SizeConfig.dart';
 
 import 'package:pit/view/homescreen.dart';
 
 class AccountNew extends StatefulWidget {
+  const AccountNew({super.key});
+
   @override
   State<AccountNew> createState() => _AccountNewState();
 }
@@ -24,8 +25,8 @@ class _AccountNewState extends State<AccountNew> {
     super.dispose();
   }
 
-  String _Message = '';
-  bool _isChecked = false;
+  final String _Message = '';
+  final bool _isChecked = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -35,7 +36,7 @@ class _AccountNewState extends State<AccountNew> {
     MySize().init(context);
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
         body: Center(
           child: SingleChildScrollView(
@@ -54,7 +55,7 @@ class _AccountNewState extends State<AccountNew> {
                         children: [
                           Image(
                             width: MySize.getScaledSizeWidth(250), //160
-                            image: AssetImage('assets/images/thumb.png'),
+                            image: const AssetImage('assets/images/thumb.png'),
                           ),
                           const SizedBox(
                             height: 20,
@@ -71,9 +72,7 @@ class _AccountNewState extends State<AccountNew> {
                                     80.0, MediaQuery.of(context).size.height)),
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                onPrimary: const Color.fromRGBO(28, 49, 71, 1),
-                                primary: const Color.fromRGBO(28, 49, 71, 1),
-                                minimumSize: Size(250, 50),
+                                minimumSize: const Size(250, 50),
                                 padding:
                                     const EdgeInsets.only(left: 37, right: 37),
                                 shape: const RoundedRectangleBorder(
@@ -85,7 +84,7 @@ class _AccountNewState extends State<AccountNew> {
                                 Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => HomeScreen(0),
+                                      builder: (context) => const HomeScreen(0),
                                     ));
                               },
                               child: const Text(

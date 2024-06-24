@@ -33,7 +33,6 @@ import '../network/worksheet.dart';
 import '../notifier/UserNotifier.dart';
 import '../notifier/tabNotifier.dart';
 import '../themes/AppTheme.dart';
-import '../utils/SizeConfig.dart';
 import '../utils/boxData.dart';
 import '../utils/notificationApi.dart';
 
@@ -44,7 +43,7 @@ import '../utils/notificationApi.dart';
 class HomeScreen extends StatefulWidget {
   final int _currentIndex;
 
-  HomeScreen(this._currentIndex);
+  const HomeScreen(this._currentIndex, {super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -72,7 +71,7 @@ class _HomeState extends State<HomeScreen> {
     // });
   }
 
-  dynamic dataNotif = null;
+  dynamic dataNotif;
   _HomeState(this._currentIndex);
 
   //firebase
@@ -219,8 +218,8 @@ class _HomeState extends State<HomeScreen> {
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * .07,
                 ),
-                Expanded(
-                  child: Container(
+                const Expanded(
+                  child: SizedBox(
                     width: double.infinity,
                     child: Center(
                       child: CircularProgressIndicator(
@@ -289,10 +288,10 @@ class _HomeState extends State<HomeScreen> {
               await BoxData.addTaskToListTask(
                   dataTask: val, handoff: val['handoff']);
 
-              var box_DetailList = await Hive.openBox("box_detailPekerjaan");
-              if (box_DetailList.isNotEmpty) {
+              var boxDetaillist = await Hive.openBox("box_detailPekerjaan");
+              if (boxDetaillist.isNotEmpty) {
                 detailTask = Map<String, dynamic>.from(
-                    box_DetailList.get(Task['id'].toString()));
+                    boxDetaillist.get(Task['id'].toString()));
                 Navigator.pop(context);
 
                 // ModalRoute.of(context)!.settings.name;
@@ -409,7 +408,7 @@ class _HomeState extends State<HomeScreen> {
 
   showAlertDialog(BuildContext context, bool cekLocation) {
     String Info = "";
-    var HowtoActivLoc = RichText(text: TextSpan(children: []));
+    var HowtoActivLoc = RichText(text: const TextSpan(children: []));
 
     if (!cekLocation) {
       Info = "Harap izinkan permission lokasi di device anda";
@@ -460,19 +459,19 @@ class _HomeState extends State<HomeScreen> {
     }
 
     Widget continueButton = TextButton(
-      child: Text("kembali ke Beranda"),
+      child: const Text("kembali ke Beranda"),
       onPressed: () {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => HomeScreen(0),
+              builder: (context) => const HomeScreen(0),
             ));
       },
     );
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      insetPadding: EdgeInsets.symmetric(vertical: 130, horizontal: 30),
+      insetPadding: const EdgeInsets.symmetric(vertical: 130, horizontal: 30),
 
       // actionsPadding: EdgeInsets.only(top: 10),
       title: const Text(
@@ -534,8 +533,8 @@ class _HomeState extends State<HomeScreen> {
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * .10,
                 ),
-                Expanded(
-                  child: Container(
+                const Expanded(
+                  child: SizedBox(
                     width: double.infinity,
                     child: Center(
                       child: CircularProgressIndicator(
@@ -665,41 +664,38 @@ class _HomeState extends State<HomeScreen> {
 //         print(message.data['id']);
 //         print(message.data['name']);
 //         print(message.data['customer']);
-        if (message != null) {
-          // int messageid = int.parse(message.data['id']);
-          // print("onmessage active 1");
-          if (message.data['name'] != null &&
-              message.data['customer'] != null) {
-            dataNotif = message;
+        // int messageid = int.parse(message.data['id']);
+        // print("onmessage active 1");
+        if (message.data['name'] != null && message.data['customer'] != null) {
+          dataNotif = message;
 
-            // print("onmessage active 2");
-            //disabled 30082022
-            //     var rng = Random();
-            //   NotificationApi.showNotification(
-            //       id: rng.nextInt(100),
-            //       title: "${message.data['name']}",
-            //       body: "${message.data['customer']}  ${message.data['jarak']}",
-            //       payload: message.data['id']);
-            //close tag
-            final box = boxData(nameBox: "box_showNotif");
-            Map data = {"data": message.data};
-            if (message.data['id'] != null) {
-              box.addDataShowNotif(message.data['id'], Map.from(message.data));
-            }
-          }
+          // print("onmessage active 2");
           //disabled 30082022
-          // final addMessage = boxData(nameBox: "box_listMessages");
-          // await addMessage.addMessage(
-          //     title: "${message.data['name']}",
-          //     body: "${message.data['customer']}  ${message.data['jarak']}",
-          //     data: message.data);
-          // //TODO: nambah hitungan total pesan
-          // final updateNotif = boxData(nameBox: 'box_loncengNotif');
-          // await updateNotif.updateTriggerNotif(param: true);
-
+          //     var rng = Random();
+          //   NotificationApi.showNotification(
+          //       id: rng.nextInt(100),
+          //       title: "${message.data['name']}",
+          //       body: "${message.data['customer']}  ${message.data['jarak']}",
+          //       payload: message.data['id']);
           //close tag
-
+          final box = boxData(nameBox: "box_showNotif");
+          Map data = {"data": message.data};
+          if (message.data['id'] != null) {
+            box.addDataShowNotif(message.data['id'], Map.from(message.data));
+          }
         }
+        //disabled 30082022
+        // final addMessage = boxData(nameBox: "box_listMessages");
+        // await addMessage.addMessage(
+        //     title: "${message.data['name']}",
+        //     body: "${message.data['customer']}  ${message.data['jarak']}",
+        //     data: message.data);
+        // //TODO: nambah hitungan total pesan
+        // final updateNotif = boxData(nameBox: 'box_loncengNotif');
+        // await updateNotif.updateTriggerNotif(param: true);
+
+        //close tag
+
         // setState(() {});
       });
     } else {
@@ -777,7 +773,7 @@ class _HomeState extends State<HomeScreen> {
 
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                builder: (context) => LoginPhone(),
+                builder: (context) => const LoginPhone(),
               ),
               (route) => false);
           // Navigator.pushReplacement(
@@ -789,7 +785,7 @@ class _HomeState extends State<HomeScreen> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      insetPadding: EdgeInsets.symmetric(vertical: 130, horizontal: 30),
+      insetPadding: const EdgeInsets.symmetric(vertical: 130, horizontal: 30),
 
       // actionsPadding: EdgeInsets.only(top: 10),
       title: const Text(
@@ -847,7 +843,7 @@ class _HomeState extends State<HomeScreen> {
 
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                builder: (context) => LoginPhone(),
+                builder: (context) => const LoginPhone(),
               ),
               (route) => false);
           // Navigator.pushReplacement(
@@ -902,7 +898,7 @@ class _HomeState extends State<HomeScreen> {
       final secretKey = await getUserid.getLoginCredential(param: "secretKey");
       final phone = await getUserid.getLoginCredential(param: "phone");
       final OpenUserToken = await Hive.openBox("box_usertoken");
-      final user_token = OpenUserToken.get(phone);
+      final userToken = OpenUserToken.get(phone);
       if (userid != "" && token != "" && secretKey != "") {
         masterNetwork objMasterProd = masterNetwork();
         var result = await objMasterProd.cekUserActive(int.parse(userid));
@@ -914,7 +910,8 @@ class _HomeState extends State<HomeScreen> {
           // print(user_token);
           // print(result.Data);
           // print(result.Data['token']);
-          if (user_token != result.Data['token']) {
+          print("${userToken} ${result.Data['token']} haloo");
+          if (userToken != result.Data['token']) {
             alertUserActive(context, int.parse(userid), phone);
             autoCekUserActive!.cancel();
           }
@@ -979,7 +976,7 @@ class _HomeState extends State<HomeScreen> {
       // dataNotif = message;
       int _totalNotifications = 0;
       //TODO process messages
-      if (message != null && message.data.isNotEmpty) {
+      if (message.data.isNotEmpty) {
         if (message.data['name'] != null && message.data['customer'] != null) {
           await redirectNotif(message);
         }
@@ -1005,11 +1002,11 @@ class _HomeState extends State<HomeScreen> {
       LocationPermission permission;
       permission = await Geolocator.checkPermission();
       Preferences pref = Preferences();
-      int user_active = await pref.getUserActive();
+      int userActive = await pref.getUserActive();
       Connection objCekConnection = Connection();
 //mattin ketika user active false
       Network cekKoneksi = await objCekConnection.CheckConnection();
-      if (cekKoneksi.Status && user_active == 1) {
+      if (cekKoneksi.Status && userActive == 1) {
         // bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
         // print("service location status");
         // print(permission != LocationPermission.denied);
@@ -1021,16 +1018,14 @@ class _HomeState extends State<HomeScreen> {
               desiredAccuracy: LocationAccuracy.best);
           var lat = _locationData.latitude;
           var long = _locationData.longitude;
-          if (lat != null && long != null) {
-            UserNetwork objUserNetwork = UserNetwork();
-            // print("lat long");
-            // print("${lat}, ${long}");
-            // print("${_locationData.latitude}, ${_locationData.longitude}");
-            Network objNetwork =
-                await objUserNetwork.sendGeolocate(lat: lat, long: long);
-            if (objNetwork.Status) {
-              // print("geolocate keterima");
-            }
+          UserNetwork objUserNetwork = UserNetwork();
+          // print("lat long");
+          // print("${lat}, ${long}");
+          // print("${_locationData.latitude}, ${_locationData.longitude}");
+          Network objNetwork =
+              await objUserNetwork.sendGeolocate(lat: lat, long: long);
+          if (objNetwork.Status) {
+            // print("geolocate keterima");
           }
         }
       }
@@ -1050,7 +1045,7 @@ class _HomeState extends State<HomeScreen> {
       if (cekKoneksi.Status) {
         // responseData = true;
 
-        if (strUserId != "" && strUserId != null && responseData) {
+        if (strUserId != "" && responseData) {
           int count = 1;
 
           // isi box upload status worksheet
@@ -1208,7 +1203,7 @@ class _HomeState extends State<HomeScreen> {
         //     responseData = true;
         //   });
         // } else {
-        Future.delayed(new Duration(seconds: 5), () async {
+        Future.delayed(const Duration(seconds: 5), () async {
           print("timer for waiting reset ");
 
           responseData = true;
@@ -1226,12 +1221,12 @@ class _HomeState extends State<HomeScreen> {
   }
 
   final List<Widget> _children = [
-    HomePage(),
-    TaskReport(),
+    const HomePage(),
+    const TaskReport(),
     ChangeNotifierProvider<UserNotifier>(
       create: (context) => UserNotifier(),
       child: Builder(builder: (BuildContext context) {
-        return Account();
+        return const Account();
       }),
     )
   ];
@@ -1254,12 +1249,13 @@ class _HomeState extends State<HomeScreen> {
         // SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop', true);
       },
       child: MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+        data: MediaQuery.of(context)
+            .copyWith(textScaler: const TextScaler.linear(1.0)),
         child: Scaffold(
           body: _children[_currentIndex],
           bottomNavigationBar: BottomNavigationBar(
             selectedItemColor: AppTheme.warnaHijau,
-            unselectedItemColor: Color(0xFF060606),
+            unselectedItemColor: const Color(0xFF060606),
             onTap: onTabTapped,
             currentIndex: _currentIndex,
             items: const [

@@ -5,14 +5,14 @@ import 'package:pit/themes/AppTheme.dart';
 import 'package:pit/utils/SizeConfig.dart';
 
 class TaskReport extends StatelessWidget {
-  TaskReport();
+  const TaskReport({super.key});
 
   @override
   Widget build(BuildContext context) {
     MySize().init(context);
     final ThemeData themeData = Theme.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: AppTheme.warnaUngu,
@@ -39,21 +39,21 @@ class TaskReport extends StatelessWidget {
                         decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
-                              color: Color(0xFFE9E9E9),
+                              color: const Color(0xFFE9E9E9),
                               width: MySize.getScaledSizeWidth(2),
                             ),
                           ),
                         ),
                       )),
                       TabBar(
-                        unselectedLabelColor: Color(0xFF333333),
+                        unselectedLabelColor: const Color(0xFF333333),
                         labelColor: AppTheme.warnaHijau,
                         labelStyle: AppTheme.OpenSans600(
                           18,
                           AppTheme.warnaHijau,
                         ),
                         unselectedLabelStyle:
-                            AppTheme.OpenSans400(18, Color(0xFF333333)),
+                            AppTheme.OpenSans400(18, const Color(0xFF333333)),
                         indicator: UnderlineTabIndicator(
                             borderSide: BorderSide(
                               width: MySize.getScaledSizeWidth(2),
@@ -76,7 +76,7 @@ class TaskReport extends StatelessWidget {
                     ],
                   ),
                 ),
-                Expanded(
+                const Expanded(
                   child: TabBarView(
                     children: [
                       TaskOngoing(),
@@ -95,12 +95,14 @@ class TaskReport extends StatelessWidget {
 }
 
 class TaskOngoing extends StatelessWidget {
+  const TaskOngoing({super.key});
+
   @override
   Widget build(BuildContext context) {
     // print("kesini nih task ongoin g");
     final ThemeData themeData = Theme.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
         body: SafeArea(
           child: Container(
@@ -117,11 +119,13 @@ class TaskOngoing extends StatelessWidget {
 }
 
 class TaskHistory extends StatelessWidget {
+  const TaskHistory({super.key});
+
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
         body: SafeArea(
           child: Container(
@@ -138,11 +142,13 @@ class TaskHistory extends StatelessWidget {
 }
 
 class TaskPending extends StatelessWidget {
+  const TaskPending({super.key});
+
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: Scaffold(
         body: SafeArea(
           child: Container(
