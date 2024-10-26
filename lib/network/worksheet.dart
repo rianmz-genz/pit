@@ -11,7 +11,7 @@ import '../utils/boxData.dart';
 
 class WorksheetNetwork {
   // final String _Url = "https://testpit.odoo.com"; //staging
-  final String _Url = "http://103.195.30.141:8069"; //production
+  final String _Url = "https://odoo.pitelektronik.com"; //production
   String generateMd5(String input) {
     return md5.convert(utf8.encode(input)).toString();
   }

@@ -95,6 +95,8 @@ dependencies:
 #  image_path: "assets/icon/logo_pit.png"
 #  adaptive_icon_background: "assets/icon/background_white.png"
 #  adaptive_icon_foreground: "assets/icon/background_white.png"
+dependency_overrides:
+    win32: ^5.5.4
 dev_dependencies:
   flutter_test:
     sdk: flutter

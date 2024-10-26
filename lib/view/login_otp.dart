@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
@@ -70,16 +69,6 @@ class LoginOtp extends StatelessWidget {
                               'Mohon masukkan kode 4 digit yang terdaftar untuk anda ',
                           style:
                               AppTheme.OpenSans600(15, const Color(0xFF1C1939)),
-                          // children: <TextSpan>[
-                          //   TextSpan(
-                          //       text: '+62 ' + Phone.replaceFirst("0", "", 0),
-                          //       style: AppTheme.OpenSans600(
-                          //           15, Color(0xFF00A09D)),
-                          //       recognizer: TapGestureRecognizer()
-                          //         ..onTap = () {
-                          //           // navigate to desired screen
-                          //         })
-                          // ]
                         ),
                       ),
                       SizedBox(
@@ -118,17 +107,11 @@ class LoginOtp extends StatelessWidget {
                             print("sercret key dari otp page");
                             print(strSecretKey);
                             if (myNumberController.length == 4) {
-                              // Preferences objPreferences = Preferences();
-                              // String strSecretKey =
-                              //     await objPreferences.getSecretKey();
-
-                              // String strUserId = await boxdata.getLoginCredential(param: "userId") ?? "";
                               UserNetwork objUserNetwork = UserNetwork();
 
                               double lat;
                               double long;
 
-                              // if (cekKoneksi.Status) {
                               var addUserToken = Hive.box("box_usertoken");
                               String userToken = "";
 
@@ -138,17 +121,11 @@ class LoginOtp extends StatelessWidget {
                                 userToken = value ?? "";
                                 addUserToken.put(Phone, userToken);
                               });
-                              // print("user_token");
-                              // print(user_token);
-                              print(userToken);
 
                               Network objNetwork =
                                   await objUserNetwork.getUserOtp(strSecretKey,
                                       Phone, myNumberController, userToken, 1);
 
-//
-
-//TODO send geolocation
                               bool checkGeolocation = false;
                               bool serviceEnabled =
                                   await Geolocator.isLocationServiceEnabled();
@@ -158,19 +135,14 @@ class LoginOtp extends StatelessWidget {
                                         desiredAccuracy: LocationAccuracy.high);
                                 lat = _locationData.latitude;
                                 long = _locationData.longitude;
-                                // print("lat long from page otp");
-                                // print(lat);
-                                // print(long);
                                 if (objNetwork.Status) {
                                   UserNetwork objUserNetwork = UserNetwork();
                                   Network objNetworkGeo = await objUserNetwork
                                       .sendGeolocate(lat: lat, long: long);
                                   if (objNetworkGeo.Status) {
                                     print("init Check Geolocation has done");
-
                                     checkGeolocation = objNetworkGeo.Status;
                                     print(checkGeolocation);
-                                    // print("geolocate keterima");
                                   } else {
                                     checkGeolocation = objNetworkGeo.Status;
                                     if (objNetwork.Message != null) {
@@ -181,7 +153,6 @@ class LoginOtp extends StatelessWidget {
                                     }
                                   }
                                 } else {
-                                  //jika false
                                   checkGeolocation = objNetwork.Status;
                                   if (objNetwork.Message != null) {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -197,8 +168,6 @@ class LoginOtp extends StatelessWidget {
                                             "Harap izinkan permission lokasi di device anda")));
                               }
 
-                              //
-                              print("sampee siniii");
                               if (checkGeolocation) {
                                 Preferences pref = Preferences();
                                 await pref.SetUserActive(1);
@@ -217,17 +186,14 @@ class LoginOtp extends StatelessWidget {
                                       await objMasterProd
                                           .getMasterWaktuGaransi();
 
-                                  //TODO init dasboard value dan get task/count
                                   String userId = await boxdata
                                       .getLoginCredential(param: "userId");
 
                                   int userID = int.parse(userId);
 
                                   await initDashBoard(userId);
-                                  // await fillDashboard(userID, lat, long);
                                   await restartListUpload(userId);
-                                  //count
-
+                                  
                                   Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
@@ -240,13 +206,9 @@ class LoginOtp extends StatelessWidget {
                               }
                             }
                           },
-                          onChanged: (value) {
-                            // print(value);
-                          },
+                          onChanged: (value) {},
                           beforeTextPaste: (text) {
                             print("Allowing to paste $text");
-                            //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
-                            //but you can show anything you want here, like your pop up saying wrong paste format or etc
                             return true;
                           },
                           appContext: context,
@@ -255,28 +217,6 @@ class LoginOtp extends StatelessWidget {
                       SizedBox(
                         height: 53 * MySize.scaleFactorHeight,
                       ),
-                      // Text(
-                      //   'Tidak dapat kode?',
-                      //   style: AppTheme.OpenSans600(15, Color(0xFF1C1939)),
-                      // ),
-                      // // SizedBox(
-                      // //   height: MediaQuery.of(context).size.height * 0.02,
-                      // // ),
-                      // SizedBox(
-                      //   height: 16 * MySize.scaleFactorHeight,
-                      // ),
-                      // InkWell(
-                      //   onTap: () {},
-                      //   child: const Text(
-                      //     'Kirim ulang kode',
-                      //     style: TextStyle(
-                      //         decoration: TextDecoration.underline,
-                      //         color: Color(0xFF00A09D),
-                      //         fontFamily: 'OpenSans',
-                      //         fontWeight: FontWeight.w600,
-                      //         fontSize: 18),
-                      //   ),
-                      // ),
                     ],
                   ),
                 ),
@@ -290,13 +230,8 @@ class LoginOtp extends StatelessWidget {
     TaskNetwork objTaskNetwork = TaskNetwork();
     Network objNetwork = await objTaskNetwork.getTaskCount(userid: userId);
     if (objNetwork.Status) {
-      //open box list pekerjaan
-
-      //simpan data ke dblokal
       var updateDasboard = boxData(nameBox: 'box_dashboard');
       var addList = boxData(nameBox: 'box_listPekerjaan');
-      // updateDasboard.addDataDashboard(
-      //     param: 'getPekerjaan', tambah: false, reset: true);
       updateDasboard.addDataDashboard(
           param: 'taskDikirim', tambah: false, reset: true);
       await addList.countListTaskOnHome(
@@ -304,8 +239,6 @@ class LoginOtp extends StatelessWidget {
           point: objNetwork.Data['point'],
           FinishTask: objNetwork.Data['FinishTask']);
     }
-    //
-    //TODO: count Pekerjaan diambil dari history
 
     Network objNetworkHistory = await objTaskNetwork.getTaskList(
       strUserId: userId.toString(),
@@ -315,13 +248,8 @@ class LoginOtp extends StatelessWidget {
     );
     if (objNetwork.Status) {
       final dataResultHistory = await objNetworkHistory.Data;
-
-      //open box list pekerjaan
-
-      //simpan data ke dblokal
       var updateDasboard = boxData(nameBox: 'box_dashboard');
       var addHistory = boxData(nameBox: 'box_historyPekerjaan');
-
       updateDasboard.addDataDashboard(
           param: 'selesaiAll', tambah: false, reset: true);
       updateDasboard.addDataDashboard(
@@ -330,20 +258,11 @@ class LoginOtp extends StatelessWidget {
     } else {
       print("anda tidak terhubung ke jaringan internet");
     }
-    //
   }
 
   Future<void> restartListUpload(String userId) async {
     final boxdata = boxData(nameBox: "box_setLoginCredential");
-
-    // String userId =
-    // await boxdata
-    //     .getLoginCredential(
-    //     param:
-    //     "userId");
     final boxOpendataupload = await Hive.openBox("box_listUploadWorksheet");
-
-    bool checkdata = false;
     if (boxOpendataupload.isNotEmpty) {
       if (userId != 0) {
         final data = boxOpendataupload.get(userId) ?? [];
@@ -352,7 +271,6 @@ class LoginOtp extends StatelessWidget {
             val['upload'] = 0;
             print(val);
           }
-
           print("dari reset listupload");
           print(data);
         } else {
@@ -367,7 +285,6 @@ class LoginOtp extends StatelessWidget {
   }
 
   Future<void> initDashBoard(String userId) async {
-    late var dir;
     final tanggal = DateFormat('dd').format(DateTime.now());
     await Hive.openBox("box_dashboard");
     final boxdata = boxData(nameBox: "box_setLoginCredential");
@@ -383,16 +300,12 @@ class LoginOtp extends StatelessWidget {
     };
 
     var openboxDashboard = await Hive.openBox("box_dashboard");
-
     if (openboxDashboard.isOpen) {
       var insertboxDashboard = Hive.box("box_dashboard");
       if (openboxDashboard.isNotEmpty) {
         var dataDasboardDB = openboxDashboard.get(userId);
-
         if (dataDasboardDB != null) {
         } else {
-          // print('kesini');
-
           print('start dashboard');
           print(dataDasboard);
           insertboxDashboard.put(userId, dataDasboard);

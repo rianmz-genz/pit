@@ -6,7 +6,7 @@ import 'package:pit/model/mNetwork.dart';
 import 'master.dart';
 
 class Connection {
-  String linkTested = 'testpit.odoo.com'; //staging
+  String linkTested = 'odoo.pitelektronik.com'; //staging
   // String linkTested = 'pitelektronik.odoo.com'; //production
   // String linkTested = 'www.google.com';
   bool result = false;

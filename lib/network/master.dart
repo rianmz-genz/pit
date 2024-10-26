@@ -10,7 +10,7 @@ import 'package:pit/utils/boxData.dart';
 class masterNetwork {
   // final String _Url = "https://testpit.odoo.com"; //staging
   // final String _Url = "http://103.195.30.141:8069"; //dev
-  final String _Url = "http://103.112.138.147:8069"; //production
+  final String _Url = "https://odoo.pitelektronik.com"; //production
   Future<Network> getMasterProduct() async {
     OdooServer objOdooServer = OdooServer();
     Network objNetwork = Network(Status: false);
