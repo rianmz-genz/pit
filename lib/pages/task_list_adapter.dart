@@ -60,14 +60,9 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
     Network cekKoneksi = await objCekConnection.CheckConnection();
 //cek lokasi
     //TODO cek lokasi di dalam "ambil pekerjaan"
-
     //init box
-    var boxAdddetail = Hive.box("box_detailPekerjaan");
-
-    var boxAddlist = Hive.box("box_listPekerjaan");
     var boxOpenlistpekerjaan = await Hive.openBox("box_listPekerjaan");
     var boxOpenhistorypekerjaan = await Hive.openBox("box_historyPekerjaan");
-
     if (widget.Status == "Pending") {
       updateDasboard.addDataDashboard(
           param: 'taskPendingKirim', tambah: false, reset: true);
@@ -212,6 +207,8 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
       //TODO ongoing
       if (widget.Status == "OnGoing") {
         bool checkloc = await checkLoc();
+
+        print("apakah loc $checkloc ${boxOpenlistpekerjaan.isNotEmpty}");
         if (!checkloc) {
           return null;
         }
@@ -247,6 +244,7 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
               Status: widget.Status,
               Lat: latLong['lat'] ?? 0,
               Lng: latLong['long'] ?? 0);
+              print("sampaaiu subu ${objNetwork.Data}");
           if (!objNetwork.Status) {
             //if untuk ngakalin agar tidak get api dengan param status history
             return [];
@@ -257,14 +255,16 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
 
             var addList = boxData(nameBox: 'box_listPekerjaan');
             if (widget.Status == "OnGoing") {
-              final updateList = boxData(nameBox: 'box_listPekerjaan');
+          print("sebelumrefrehs");
 
               await addList.refreshListTask(
                   userid: userid,
                   statusTask: widget.Status,
                   values: dataResult);
+
               dataStsWrkShtServer = [];
               statusTask = [];
+          print("setelahrefreshTask");
               var viewData = List.from(boxOpenlistpekerjaan.get(userid) ?? []);
               for (var value in viewData) {
                 if (value['StatusTask'] == 'OnGoing' &&
@@ -274,6 +274,7 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
                   dataStsWrkShtServer.add(value['data']['status_worksheet']);
                 }
               }
+              print("sampaiss result $lstResult");
               return lstResult;
             }
           }
@@ -532,7 +533,7 @@ class _TaskListAdapterState extends State<TaskListAdapter> {
       showAlertDialog(context, false);
       return false;
     }
-
+  
     latLong = {"lat": dataLat, "long": dataLong};
     return true;
   }

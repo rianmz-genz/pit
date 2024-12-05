@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:pit/helpers/Preferences.dart';
 import 'package:pit/model/mNetwork.dart';
 import 'package:pit/network/user.dart';
+import 'package:pit/pages/setting_page_url.dart';
 
 import 'package:pit/view/login_otp.dart';
 import 'package:pit/themes/AppTheme.dart';
@@ -179,6 +180,15 @@ class _LoginPhoneState extends State<LoginPhone> {
                               },
                               child: setUpButtonChild(),
                             )),
+                            TextButton(onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (builder) => SettingsPageUrl()));
+                            }, child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                              Icon(Icons.change_circle),
+                              SizedBox(width: 4,),
+                              Text("Ganti Url"),
+                            ],))
                       ]),
                 ),
               ],

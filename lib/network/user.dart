@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pit/helpers/app_helper.dart';
 import 'package:pit/model/mNetwork.dart';
 import 'package:pit/helpers/odoo.dart';
 import 'package:pit/utils/boxData.dart';
@@ -12,7 +13,8 @@ import 'package:pit/viewmodel/vmUser.dart';
 
 class UserNetwork {
   // final String _Url = "https://testpit.odoo.com"; //staging
-  final String _Url = "http://103.195.30.141:8069"; //production
+  // final String _Url = "http://103.195.30.141:8069"; //dev
+  final String _Url = AppConfig().getBaseUrl(); //production
 
   String generateMd5(String input) {
     return md5.convert(utf8.encode(input)).toString();

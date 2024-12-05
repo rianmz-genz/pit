@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart';
+import 'package:pit/helpers/app_helper.dart';
 
 import 'package:pit/model/mNetwork.dart';
 import 'package:pit/helpers/odoo.dart';
@@ -11,32 +13,36 @@ import '../utils/boxData.dart';
 
 class WorksheetNetwork {
   // final String _Url = "https://testpit.odoo.com"; //staging
-  final String _Url = "http://103.195.30.141:8069"; //production
+  // final String _Url = "http://103.195.30.141:8069"; //dev
+  final String _Url = AppConfig().getBaseUrl(); //production
   String generateMd5(String input) {
     return md5.convert(utf8.encode(input)).toString();
   }
 
   Future<Network> getWorksheetForm({required int TaskId}) async {
-    OdooServer objOdooServer = OdooServer();
+      OdooServer objOdooServer = OdooServer();
     Network objNetwork = Network(Status: false);
-
-    dynamic objResult = {};
-    dynamic headers = await objOdooServer.getHeaderApiParam();
+        dynamic headers = await objOdooServer.getHeaderApiParam();
     dynamic objParam = {
       "method": "call",
       "jsonrpc": "2.0",
       "params": {"taskid": TaskId}
     };
-    print('objParam get worksheet form');
+
+    try {
+
+    print('objParam get worksheet form ${objParam}');
     print(objParam);
     var request = http.Request('POST', Uri.parse('$_Url/worksheet/form'));
     request.body = json.encode(objParam);
     request.headers.addAll(headers);
-    http.StreamedResponse response = await request.send();
+  print("strResultsebelum");
 
+    http.StreamedResponse response = await request.send().timeout(const Duration(seconds: 10));
+  print("strResultsesudah ${response.statusCode}");
     if (response.statusCode == 200) {
       String strResult = await response.stream.bytesToString();
-      print(strResult);
+      print("strResult $strResult");
       if (strResult != "") {
         objNetwork = await objOdooServer.getValidateApiResponse(
             strResult, "worksheet/form");
@@ -44,6 +50,10 @@ class WorksheetNetwork {
     }
 
     return objNetwork;
+    } catch (e) {
+      print("errrorr apa a $e");
+      return objNetwork;
+    }
   }
 
   Future<Network> saveWorksheetForm({
@@ -389,61 +399,88 @@ class WorksheetNetwork {
     return false;
   }
 
-  Future<Network> LoadWorksheetForm(
-      {required int userId,
-      required int taskId,
-      bool autoSaveLocal = true,
-      bool handoff = false}) async {
-    OdooServer objOdooServer = OdooServer();
-    Network objNetwork = Network(Status: false);
+  Future<Network> LoadWorksheetForm({
+  required int userId,
+  required int taskId,
+  bool autoSaveLocal = true,
+  bool handoff = false,
+}) async {
+  OdooServer objOdooServer = OdooServer();
+  Network objNetwork = Network(Status: false);
 
-    dynamic objResult = {};
+  try {
+    // Ambil Header dan Param
     dynamic headers = await objOdooServer.getHeaderApiParam();
     dynamic objParam = {
       "jsonrpc": "2.0",
       "params": {"userid": userId, "taskid": taskId}
     };
-    print('objParam dari file worksheet load.dart');
-    print(objParam);
+
+    // Debugging log untuk Header dan Parameter
+    print('Headers: $headers');
+    print('Parameters: $objParam');
+
+    // Buat Request
     var request = http.Request('POST', Uri.parse('$_Url/worksheet/load'));
     request.body = json.encode(objParam);
     request.headers.addAll(headers);
-    http.StreamedResponse response = await request.send();
+
+    // Debugging log sebelum mengirim request
+    print('Sending request to $_Url/worksheet/load...');
+
+    // Kirim request dengan timeout
+    http.StreamedResponse response = await request
+        .send()
+        .timeout(const Duration(seconds: 10), onTimeout: () {
+      print('Request timeout after 10 seconds');
+      throw TimeoutException('Request timed out');
+    });
+
+    // Debugging log setelah menerima respons
+    print('Response status code: ${response.statusCode}');
 
     if (response.statusCode == 200) {
       String strResult = await response.stream.bytesToString();
 
-      if (strResult != "") {
-        print('strResult line 187 from  load worksheet');
-        print(strResult);
+      if (strResult.isNotEmpty) {
+        print('Response body: $strResult');
 
         objNetwork = await objOdooServer.getValidateApiResponse(
-            strResult, "worksheet/load");
+          strResult,
+          "worksheet/load",
+        );
 
-        if (!objNetwork.Status) {
-          print("objNetwork.Status");
-          print(objNetwork.Status);
-        } else {
-          if (autoSaveLocal) {
-            dynamic valServer = objNetwork.Data;
+        if (objNetwork.Status && autoSaveLocal) {
+          dynamic valServer = objNetwork.Data;
 
-            var addValueServer = boxData(nameBox: 'box_valworksheet');
-            // await Hive.openBox("box_valworksheet");
-
-            addValueServer.addValueWorksheet(
-                valServer: valServer,
-                userid: userId.toString(),
-                taskid: taskId.toString(),
-                handoff: handoff);
-
-            // Hive.box('box_valworksheet').close();
-          }
+          // Simpan data secara lokal
+          var addValueServer = boxData(nameBox: 'box_valworksheet');
+          addValueServer.addValueWorksheet(
+            valServer: valServer,
+            userid: userId.toString(),
+            taskid: taskId.toString(),
+            handoff: handoff,
+          );
         }
 
-        print(objNetwork.Data);
+        print('Final Network Data: ${objNetwork.Data}');
+      } else {
+        print('Empty response body');
       }
+    } else {
+      print('Error: Response status code ${response.statusCode}');
     }
+  } catch (e, stacktrace) {
+    print('Exception occurred: $e');
+    print('Stacktrace: $stacktrace');
 
-    return objNetwork;
+    // Tangani timeout
+    if (e is TimeoutException) {
+      print('The request timed out');
+    }
   }
+
+  return objNetwork;
+}
+
 }

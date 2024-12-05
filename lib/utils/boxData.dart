@@ -540,7 +540,6 @@ class boxData {
       }
     }
     return objLoadData;
-    return objLoadData;
   }
 
   Future<bool> UpdateListNotif(List dataGet) async {
@@ -1063,8 +1062,11 @@ class boxData {
         dataSave.add(dataAdd);
         getDetail(data['id']);
         await getFormWorksheet(data['id']);
+        print("sampai getFormWorksheet2");
         // deleteFormWorksheet([]);
         await getValueWork(data['id'], int.parse(userid ?? ""), false);
+        print("sampai getValueWork");
+
         // updateDasboard.addDataDashboard(
         //     param: 'getPekerjaan', tambah: true, reset: false);
       }
@@ -1313,11 +1315,13 @@ class boxData {
     Connection objCekConnection = Connection();
     Network cekKoneksi = await objCekConnection.CheckConnection();
     var WorksheetForm = await Hive.openBox("box_worksheetform");
+    print("chekkkk ${cekKoneksi.Status} ${WorksheetForm.isOpen} ${WorksheetForm.isNotEmpty}");
     if (WorksheetForm.isOpen) {
       var boxAddworksheetform = Hive.box("box_worksheetform");
 
       if (WorksheetForm.isNotEmpty) {
         var data = WorksheetForm.get(taskid.toString());
+              print("data gadapet ni worksheet form nya $data");
 
         if (data == null) {
           if (cekKoneksi.Status) {
@@ -1326,23 +1330,34 @@ class boxData {
             if (!objNetwork.Status) {
               print("gadapet ni worksheet form nya");
             } else {
+              print("dapet ni worksheet form nya");
+
               boxAddworksheetform.put(taskid.toString(), objNetwork.Data);
               return true;
             }
           }
+
         } else {
           return true;
         }
       } else {
+
+    print("chekkkkObjs ${cekKoneksi.Status}");
         if (cekKoneksi.Status) {
           Network objNetwork =
               await objWorksheetNetwork.getWorksheetForm(TaskId: taskid);
+    print("chekkkkObjs2 ${objNetwork.Status}");
+
           if (!objNetwork.Status) {
             print("gadapet ni worksheet form nya");
+            return false;
           } else {
+            print("masuk objeeekk");
             boxAddworksheetform.put(taskid.toString(), objNetwork.Data);
             return true;
           }
+        } else {
+          return false;
         }
       }
       await WorksheetForm.compact();
@@ -1351,6 +1366,7 @@ class boxData {
   }
 
   Future<bool> getValueWork(int? taskid, int? userid, bool? handoff) async {
+    print("handoffs $handoff");
     if (handoff == "false") {
       handoff = false;
     } else if (handoff == "true") {
@@ -1358,10 +1374,16 @@ class boxData {
     }
     var checkdata = await getValueWorksheet(
         userid: userid.toString(), taskid: taskid.toString());
+    print("checkdataaaaaa $checkdata");
+
     if (checkdata == null) {
+          print("objLoadNetwork.Status sebelum");
       WorksheetNetwork objWorksheetNetwork = WorksheetNetwork();
+          print("objLoadNetwork.Status WorksheetNetwork");
+
       Network objLoadNetwork = await objWorksheetNetwork.LoadWorksheetForm(
           userId: userid ?? 0, taskId: taskid ?? 0, handoff: handoff!);
+          print("objLoadNetwork.Status ${objLoadNetwork.Status}");
       if (!objLoadNetwork.Status) {
         print("getValueWork");
         print(objLoadNetwork.Status);

@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart';
 import 'package:intl/intl.dart';
+import 'package:pit/helpers/app_helper.dart';
 
 import 'package:pit/model/mNetwork.dart';
 import 'package:pit/helpers/odoo.dart';
@@ -16,7 +17,8 @@ class TaskNetwork {
   // final String _Url = "http://192.168.20.24";
 
   // final String _Url = "https://testpit.odoo.com"; //staging
-  final String _Url = "http://103.195.30.141:8069"; //production
+  // final String _Url = "http://103.195.30.141:8069"; //dev
+  final String _Url = AppConfig().getBaseUrl(); //production
   String generateMd5(String input) {
     return md5.convert(utf8.encode(input)).toString();
   }

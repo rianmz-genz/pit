@@ -33,7 +33,7 @@ class Connection {
     //   // print('try to connect with connectionchecker');
     // result = await ConnectionChecker();
     // }
-
+  print("inii status ${objNetwork.Status}");
     return objNetwork;
   }
 

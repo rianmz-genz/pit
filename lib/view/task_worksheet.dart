@@ -414,7 +414,8 @@ class _worksheetStopState extends State<worksheetStop> {
     } else {
       page2Checkmandatory = int.parse(widget.page2);
     }
-    data.forEach((key, value) {
+    print("datanyaaa ${data}");
+    data?.forEach((key, value) {
       if (page2Checkmandatory == 2) {
         if (key == 'x_studio_pic_' && (value == '' || value == false)) {
           print('return false 2');

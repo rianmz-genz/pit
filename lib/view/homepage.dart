@@ -434,8 +434,10 @@ class _dashboardState extends State<dashboard> {
         await addHistory.countHistoryTaskOnHome(values: dataResultHistory);
       }
     } else {
-      final downMessage = PopupError();
+     if(mounted) {
+       final downMessage = PopupError();
       downMessage.showError(context, cekKoneksi, false, mounted);
+     }
       // print("anda tidak terhubung ke jaringan internet");
     }
   }

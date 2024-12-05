@@ -10,6 +10,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:path_provider_android/path_provider_android.dart';
+import 'package:pit/helpers/app_helper.dart';
 
 import 'package:pit/network/task.dart';
 import 'package:pit/themes/AppTheme.dart';
@@ -241,6 +242,7 @@ void main() async {
   var dir = await getApplicationDocumentsDirectory();
   // print('dir main');
   print(dir);
+    AppConfig().setBaseUrl("https://odoo.pitelektronik.com");
   Hive.init(dir.path);
   //TODO:names of box
   await Hive.openBox("box_dashboard");

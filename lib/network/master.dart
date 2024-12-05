@@ -6,11 +6,11 @@ import 'package:http/http.dart' as http;
 import 'package:pit/model/mNetwork.dart';
 import 'package:pit/helpers/odoo.dart';
 import 'package:pit/utils/boxData.dart';
-
+import '../helpers/app_helper.dart';
 class masterNetwork {
   // final String _Url = "https://testpit.odoo.com"; //staging
   // final String _Url = "http://103.195.30.141:8069"; //dev
-  final String _Url = "http://103.112.138.147:8069"; //production
+  final String _Url = AppConfig().getBaseUrl(); //production
   Future<Network> getMasterProduct() async {
     OdooServer objOdooServer = OdooServer();
     Network objNetwork = Network(Status: false);
@@ -103,7 +103,6 @@ class masterNetwork {
     request.body = json.encode(objParam);
     request.headers.addAll(headers);
     try {
-      // print('try cek koneksi');
       http.StreamedResponse response =
           await request.send().timeout(const Duration(milliseconds: 3000));
 
