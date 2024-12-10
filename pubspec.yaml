@@ -30,10 +30,9 @@ dependencies:
   flutter_markdown: ^0.6.7
   sqflite: any
   provider: ^6.0.1
-  image_picker: 0.7.0-nullsafety
+  image_picker: 1.0.4
   path_provider: ^2.0.11
   path_provider_android: ^2.0.14
-
   qr_code_scanner: ^1.0.1
 
   #firebase package for cloud messaging

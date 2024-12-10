@@ -49,14 +49,10 @@ class _ProfileState extends State<Profile> {
 
   _imgFromCamera() async {
     final pickedFile =
-        await _picker.getImage(source: ImageSource.camera, imageQuality: 20);
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 20);
     if (pickedFile != null) {
       File image = File(pickedFile.path);
       print(image.path);
-      Directory appDocumentsDirectory =
-          await getApplicationDocumentsDirectory();
-      String appDocumentsPath = appDocumentsDirectory.path;
-
       setState(() {
         _image = image;
         _imageSelect = image;
@@ -67,7 +63,7 @@ class _ProfileState extends State<Profile> {
   _imgFromGallery() async {
     try {
       final pickedFile =
-          await _picker.getImage(source: ImageSource.gallery, imageQuality: 10);
+          await _picker.pickImage(source: ImageSource.gallery, imageQuality: 10);
       print(pickedFile);
       if (pickedFile != null) {
         File image = File(pickedFile.path);
@@ -97,15 +93,15 @@ class _ProfileState extends State<Profile> {
             child: Container(
               child: Wrap(
                 children: <Widget>[
-                  // ListTile(
-                  //     leading: const Icon(Icons.photo_library),
-                  //     title: Text('Photo Library',
-                  //         style: AppTheme.OpenSans400(
-                  //             14, const Color(0xFF333333))),
-                  //     onTap: () {
-                  //       _imgFromGallery();
-                  //       Navigator.of(context).pop();
-                  //     }),
+                  ListTile(
+                      leading: const Icon(Icons.photo_library),
+                      title: Text('Photo Library',
+                          style: AppTheme.OpenSans400(
+                              14, const Color(0xFF333333))),
+                      onTap: () {
+                        _imgFromGallery();
+                        Navigator.of(context).pop();
+                      }),
                   ListTile(
                     leading: const Icon(Icons.photo_camera),
                     title: Text('Camera',

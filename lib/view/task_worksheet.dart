@@ -2477,7 +2477,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
       dynamic data, String userid, String taskid) async {
     File image = File("");
     final pickedFile =
-        await _picker.getImage(source: ImageSource.camera, imageQuality: 20);
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 20);
     if (pickedFile != null) {
       image = File(pickedFile.path);
       valuess[data.name] = image;
@@ -2493,7 +2493,7 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
       print("pick");
       File image = File("");
       final pickedFile =
-          await _picker.getImage(source: ImageSource.gallery, imageQuality: 20);
+          await _picker.pickImage(source: ImageSource.gallery, imageQuality: 20);
       print(pickedFile);
       if (pickedFile != null) {
         print("dapat");
@@ -2529,14 +2529,14 @@ class _TaskWorksheeyWidgetState extends State<TaskWorksheeyWidget> {
               child: Container(
                 child: Wrap(
                   children: <Widget>[
-                    // ListTile(
-                    //     leading: Icon(Icons.photo_library),
-                    //     title: Text('Photo Library',
-                    //         style: AppTheme.OpenSans400(14, Color(0xFF333333))),
-                    //     onTap: () {
-                    //       _imgFromGallery(data, userid, taskid);
-                    //       Navigator.of(context).pop();
-                    //     }),
+                    ListTile(
+                        leading: Icon(Icons.photo_library),
+                        title: Text('Photo Library',
+                            style: AppTheme.OpenSans400(14, Color(0xFF333333))),
+                        onTap: () {
+                          _imgFromGallery(data, userid, taskid);
+                          Navigator.of(context).pop();
+                        }),
                     ListTile(
                       leading: Icon(Icons.photo_camera),
                       title: Text('Camera',
